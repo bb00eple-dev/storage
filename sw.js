@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cotton-zip-shell-v3';
+const CACHE_NAME = 'cotton-zip-shell-v4-layout-fix-20261125';
 const APP_FILES = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', event => {
