@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="cotton-build" content="layout-dock-fix-2026-11-25-v2">
+<meta name="cotton-build" content="backup-import-fix-v5-20261125">
 <meta name="theme-color" content="#fffefa">
 <title>cotton.zip - text archive</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
@@ -450,7 +450,7 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
       <button class="toolbtn" id="favBtn" title="즐겨찾기 설정"><span class="toolglyph">♡</span><span class="tool-label">Favorite<small class="gloss">즐겨찾기</small></span></button>
       <span class="tool-sep"></span>
       <button class="toolbtn" id="backupBtn" title="JSON 백업"><span class="toolglyph">↓</span><span class="tool-label">Backup<small class="gloss">백업</small></span></button>
-      <button class="toolbtn" id="importBtn" title="백업 불러오기"><span class="toolglyph">↑</span><span class="tool-label">Import<small class="gloss">불러오기</small></span></button>
+      <button class="toolbtn" id="importBtn" title="JSON 백업 파일 불러오기"><span class="toolglyph">↑</span><span class="tool-label">Import<small class="gloss">불러오기</small></span></button>
       <div class="search-wrap"><span style="color:#817b70">⌕</span><input id="searchInput" type="search" placeholder="Search... 검색" aria-label="검색"></div>
     </div>
     <div class="mainarea">
@@ -538,7 +538,7 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
       <div class="dialog-actions"><button id="selectCopyText">Select all <small class="gloss">전체 선택</small></button><button class="primary" id="closeManualCopy">Close <small class="gloss">닫기</small></button></div>
     </div>
   </div>
-  <input type="file" id="fileInput" accept=".json,application/json" hidden>
+  <input type="file" id="fileInput" accept=".json,application/json,text/json" aria-label="JSON 백업 파일 선택" style="position:fixed;left:-10000px;top:0;width:1px;height:1px;opacity:0;pointer-events:none">
 </div>
 <script>
 (()=>{
@@ -664,8 +664,101 @@ function openCategoryDialog(){$('categoryScrim').classList.add('open');renderCat
 function closeCategoryDialog(){$('categoryScrim').classList.remove('open')}
 function renderCategoryManager(){const host=$('categoryList');host.replaceChildren();if(!categories.length){const p=document.createElement('div');p.className='dialog-note';p.textContent='아직 만든 카테고리가 없습니다.';host.append(p)}categories.forEach(cat=>{const row=document.createElement('div');row.className='category-row';const label=document.createElement('span');label.className='cat-label';label.textContent=cat.name;const rename=document.createElement('button');rename.type='button';rename.textContent='✎';rename.title='Rename · 이름 변경';rename.setAttribute('aria-label','Rename category · 카테고리 이름 변경');rename.addEventListener('click',()=>{const name=window.prompt('새 카테고리 이름을 입력하세요.',cat.name);if(name===null)return;const clean=name.trim().slice(0,28);if(!clean)return;if(categories.some(c=>c.id!==cat.id&&c.name.toLowerCase()===clean.toLowerCase())){alert('같은 이름의 카테고리가 이미 있어요.');return}cat.name=clean;persist();renderCategoryManager();render();toast('Category renamed · 이름 변경 완료')});const del=document.createElement('button');del.type='button';del.textContent='×';del.title='Delete · 삭제';del.setAttribute('aria-label','Delete category · 카테고리 삭제');del.addEventListener('click',()=>{if(!confirm(`'${cat.name}' 카테고리를 삭제할까요? 안의 항목은 미분류로 이동합니다.`))return;items.forEach(x=>{if(x.categoryId===cat.id){x.categoryId='';x.updated=new Date().toISOString()}});categories=categories.filter(c=>c.id!==cat.id);if(filter==='cat:'+cat.id)filter='all';persist();renderCategoryManager();render();toast('Category deleted · 분류 삭제 완료')});row.append(label,rename,del);host.append(row)})}
 function addCategory(){const input=$('newCategoryName');const name=input.value.trim().slice(0,28);if(!name){input.focus();return}if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){toast('이미 있는 카테고리예요.');return}categories.push({id:makeId('cat'),name});input.value='';persist();renderCategoryManager();renderCategories();fillCategorySelect($('itemCategory').value);toast('Category added · 분류 추가 완료')}
-function exportBackup(){const payload={app:'cotton.zip',version:3,exportedAt:new Date().toISOString(),categories,items};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cotton-zip-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);toast('Backup created · 백업 파일 생성 완료')}
-function importBackup(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(String(reader.result));const importedCategories=Array.isArray(data)?[]:normalizeCategories(Array.isArray(data.categories)?data.categories:[]);const rawItems=Array.isArray(data)?data:(data.items);if(!Array.isArray(rawItems))throw new Error('invalid');const oldCategories=categories;categories=importedCategories;const clean=normalizeItems(rawItems);if(rawItems.length&&clean.length===0)throw new Error('invalid');if(!confirm('현재 보관함을 백업 파일의 내용으로 교체할까요?\nReplace current archive? · 현재 자료가 파일 내용으로 바뀝니다.')){categories=oldCategories;return}items=clean;filter='all';selectedId=null;query='';$('searchInput').value='';persist();render();toast('Backup loaded · 백업 불러오기 완료')}catch(e){alert('이 파일을 백업으로 읽을 수 없어요. cotton.zip JSON 파일인지 확인해 주세요.')}};reader.readAsText(file)}
+function exportBackup(){
+  if(!currentEmail){alert('먼저 공간에 입장해 주세요.');return}
+  const payload={
+    app:'cotton.zip',
+    format:'cotton.zip-space-backup',
+    version:4,
+    exportedAt:new Date().toISOString(),
+    categories:categories.map(c=>({id:c.id,name:c.name})),
+    items:items.map(x=>({id:x.id,text:x.text,categoryId:x.categoryId||'',favorite:!!x.favorite,created:x.created,updated:x.updated}))
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;
+  a.download='cotton-zip-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.style.display='none';document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+  toast(`Backup created · ${items.length}개 항목 백업 완료`);
+}
+function readBackupFile(file){
+  if(typeof file.text==='function')return file.text();
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||''));
+    reader.onerror=()=>reject(new Error('파일을 읽지 못했어요. 파일을 다시 선택해 주세요.'));
+    reader.onabort=()=>reject(new Error('파일 읽기가 취소됐어요.'));
+    reader.readAsText(file,'UTF-8');
+  });
+}
+function extractBackupPayload(data){
+  if(Array.isArray(data))return {categories:[],items:data};
+  if(!data||typeof data!=='object')throw new Error('JSON 형식의 백업 파일이 아니에요.');
+  // Support the current format and older cotton.zip JSON exports.
+  const source=(data.archive&&typeof data.archive==='object')?data.archive:
+               (data.backup&&typeof data.backup==='object')?data.backup:data;
+  const cats=Array.isArray(source.categories)?source.categories:[];
+  let rows=Array.isArray(source.items)?source.items:
+           Array.isArray(source.entries)?source.entries:
+           Array.isArray(source.texts)?source.texts:null;
+  if(!rows)throw new Error('백업 파일에서 항목 목록(items)을 찾지 못했어요. cotton.zip에서 내보낸 JSON 파일인지 확인해 주세요.');
+  return {categories:cats,items:rows};
+}
+function importBackup(file){
+  if(!file){toast('불러올 파일을 선택해 주세요.');return}
+  if(file.size>20*1024*1024){alert('백업 파일이 너무 커요. 20MB 이하의 JSON 파일을 선택해 주세요.');return}
+  return readBackupFile(file).then(raw=>{
+    let parsed;
+    try{parsed=JSON.parse(String(raw).replace(/^\uFEFF/,''));}
+    catch(_){throw new Error('JSON 파일을 해석하지 못했어요. 파일이 손상되지 않았는지 확인해 주세요.')}
+    const payload=extractBackupPayload(parsed);
+    const previousCategories=categories;
+    const previousItems=items;
+    const importedCategories=normalizeCategories(payload.categories);
+    const categoryByName=new Map(importedCategories.map(c=>[c.name.toLowerCase(),c.id]));
+    // Accept text/content/value from older or hand-edited JSON, without dropping valid entries.
+    const adaptedItems=payload.items.map((entry,index)=>{
+      if(typeof entry==='string')return {id:makeId('item'),text:entry,categoryId:'',favorite:false};
+      if(!entry||typeof entry!=='object')return null;
+      const textValue=typeof entry.text==='string'?entry.text:
+                      typeof entry.content==='string'?entry.content:
+                      typeof entry.value==='string'?entry.value:null;
+      if(textValue===null)return null;
+      let categoryId=typeof entry.categoryId==='string'?entry.categoryId:'';
+      if(!categoryId&&typeof entry.category==='string')categoryId=categoryByName.get(entry.category.toLowerCase())||'';
+      return {id:String(entry.id||makeId('item')),text:textValue,categoryId,
+              favorite:!!entry.favorite,created:entry.created||new Date().toISOString(),
+              updated:entry.updated||entry.created||new Date().toISOString()};
+    }).filter(Boolean);
+    if(payload.items.length&&adaptedItems.length===0)throw new Error('복원할 수 있는 텍스트 항목이 없어요.');
+    categories=importedCategories;
+    const clean=normalizeItems(adaptedItems);
+    categories=previousCategories;
+    if(adaptedItems.length&&clean.length===0)throw new Error('항목을 읽었지만 저장 가능한 형식으로 변환하지 못했어요.');
+    const detail=`현재 공간의 자료를 선택한 백업으로 교체할까요?\n\n백업 항목: ${clean.length}개\n카테고리: ${importedCategories.length}개\n\nReplace current space with this backup?`;
+    if(!confirm(detail)){toast('불러오기를 취소했어요.');return}
+    categories=importedCategories;items=clean;
+    if(!persist()){
+      categories=previousCategories;items=previousItems;persist();
+      throw new Error('브라우저 저장 공간이 부족해 복원하지 못했어요. 기존 자료는 유지했어요.');
+    }
+    filter='all';selectedId=null;query='';$('searchInput').value='';
+    render();toast(`Backup loaded · ${clean.length}개 항목 복원 완료`);
+  }).catch(error=>{
+    const message=error&&error.message?error.message:'알 수 없는 오류가 발생했어요.';
+    alert('백업을 불러오지 못했어요.\n\n'+message);
+    setStatus('Import failed · 불러오기 실패');
+  });
+}
+function openImportPicker(){
+  const input=$('fileInput');
+  input.value='';
+  try{
+    if(typeof input.showPicker==='function')input.showPicker();
+    else input.click();
+  }catch(_){input.click()}
+}
 function setFilter(value){filter=value;render()}
 function openWindow(){if(!currentEmail){$('loginWindow').classList.remove('hidden');return}$('appWindow').classList.remove('hidden');document.body.dataset.minimized='false';$('taskApp').classList.add('active');$('startMenu').classList.remove('open')}
 // Email-based local spaces and remembered sign-in.
@@ -684,7 +777,7 @@ $('editBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selected
 $('deleteBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;if(!confirm(`'${x.name}' 항목을 삭제할까요?`))return;items=items.filter(y=>y.id!==x.id);selectedId=null;persist();renderList(false);toast('Item deleted · 항목 삭제 완료')});
 $('favBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;x.favorite=!x.favorite;x.updated=new Date().toISOString();persist();renderList(false);toast(x.favorite?'Added to favorites · 즐겨찾기 추가':'Removed from favorites · 즐겨찾기 해제')});
 $('backupBtn').addEventListener('click',exportBackup);$('startBackup').addEventListener('click',exportBackup);
-$('importBtn').addEventListener('click',()=>$('fileInput').click());$('fileInput').addEventListener('change',e=>{importBackup(e.target.files[0]);e.target.value=''});
+$('importBtn').addEventListener('click',openImportPicker);$('fileInput').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(file)importBackup(file);});
 $('categoryBtn').addEventListener('click',openCategoryDialog);$('manageCategoryInline').addEventListener('click',openCategoryDialog);$('sideAddCategory').addEventListener('click',openCategoryDialog);$('closeCategories').addEventListener('click',closeCategoryDialog);$('addCategory').addEventListener('click',addCategory);$('newCategoryName').addEventListener('keydown',e=>{if(e.key==='Enter')addCategory()});$('quickAddCategory').addEventListener('click',()=>{openCategoryDialog()});
 $('desktopArchive').addEventListener('click',openWindow);$('desktopComputer').addEventListener('click',()=>alert('내 컴퓨터\n\n각 이메일의 공간 데이터는 이 브라우저에 분리 저장됩니다. JSON 백업 파일을 별도로 보관해 주세요.'));
 $('taskApp').addEventListener('click',()=>{if(!currentEmail){$('loginWindow').classList.remove('hidden');return}if($('appWindow').classList.contains('hidden'))openWindow();else $('appWindow').classList.toggle('hidden')});
