@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="cotton-build" content="backup-import-ui-v6-20261125">
+<meta name="cotton-build" content="backup-import-ui-v7-visible-import-20261125">
 <meta name="theme-color" content="#fffefa">
 <title>cotton.zip - text archive</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
@@ -458,7 +458,7 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
       <button class="toolbtn" id="favBtn" title="즐겨찾기 설정"><span class="toolglyph">♡</span><span class="tool-label">Favorite<small class="gloss">즐겨찾기</small></span></button>
       <span class="tool-sep"></span>
       <button class="toolbtn" id="backupBtn" title="JSON 백업"><span class="toolglyph">↓</span><span class="tool-label">Backup<small class="gloss">백업</small></span></button>
-      <button class="toolbtn" id="importBtn" title="JSON 백업 파일 불러오기"><span class="toolglyph">↑</span><span class="tool-label">Import<small class="gloss">불러오기</small></span></button>
+      <button class="toolbtn" id="importBtn" title="JSON 백업 파일 불러오기"><span class="toolglyph">↑</span><span class="tool-label">Import<small class="gloss">불러오기</small></span><span class="sr-only">JSON 불러오기</span></button>
       <div class="search-wrap"><span style="color:#817b70">⌕</span><input id="searchInput" type="search" placeholder="Search... 검색" aria-label="검색"></div>
     </div>
     <div class="mainarea">
@@ -494,6 +494,7 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
     <div class="start-brand">✿　cotton.zip</div>
     <button class="start-option" id="startOpen"><span>▤</span> Open Text Archive <small class="gloss">보관함 열기</small></button>
     <button class="start-option" id="startBackup"><span>↓</span> Backup archive <small class="gloss">보관함 백업</small></button>
+    <button class="start-option" id="startImport"><span>↑</span> Import backup <small class="gloss">백업 불러오기</small></button>
     <button class="start-option" id="startHelp"><span>ⓘ</span> About this app <small class="gloss">앱 정보</small></button>
   </div>
   <div class="taskbar">
@@ -839,7 +840,7 @@ $('itemScrim').addEventListener('click',e=>{if(e.target===$('itemScrim'))closeIt
 $('editBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x)});
 $('deleteBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;if(!confirm(`'${x.name}' 항목을 삭제할까요?`))return;items=items.filter(y=>y.id!==x.id);selectedId=null;persist();renderList(false);toast('Item deleted · 항목 삭제 완료')});
 $('favBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;x.favorite=!x.favorite;x.updated=new Date().toISOString();persist();renderList(false);toast(x.favorite?'Added to favorites · 즐겨찾기 추가':'Removed from favorites · 즐겨찾기 해제')});
-$('backupBtn').addEventListener('click',exportBackup);$('startBackup').addEventListener('click',exportBackup);
+$('backupBtn').addEventListener('click',exportBackup);$('startBackup').addEventListener('click',()=>{ $('startMenu').classList.remove('open'); exportBackup(); });$('startImport').addEventListener('click',()=>{ $('startMenu').classList.remove('open'); openImportDialog(); });
 $('importBtn').addEventListener('click',openImportDialog);
 $('importFileInput').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];const feedback=$('importFeedback');const button=$('restoreImportBtn');button.disabled=!file;if(file){feedback.className='import-feedback';feedback.textContent=`선택한 파일: ${file.name} · ${Math.ceil(file.size/1024)} KB\n아래 Restore 버튼을 눌러 복원을 진행해 주세요.`}});
 $('restoreImportBtn').addEventListener('click',restoreSelectedBackup);
@@ -850,7 +851,7 @@ $('desktopArchive').addEventListener('click',openWindow);$('desktopComputer').ad
 $('taskApp').addEventListener('click',()=>{if(!currentEmail){$('loginWindow').classList.remove('hidden');return}if($('appWindow').classList.contains('hidden'))openWindow();else $('appWindow').classList.toggle('hidden')});
 $('minBtn').addEventListener('click',()=>{$('appWindow').classList.add('hidden');$('taskApp').classList.remove('active')});$('closeBtn').addEventListener('click',()=>{$('appWindow').classList.add('hidden');$('taskApp').classList.remove('active')});$('maxBtn').addEventListener('click',()=>$('appWindow').classList.toggle('maximized'));
 $('startBtn').addEventListener('click',()=>$('startMenu').classList.toggle('open'));$('startOpen').addEventListener('click',openWindow);$('startHelp').addEventListener('click',()=>{ $('startMenu').classList.remove('open');alert('cotton.zip · little text archive\n\n이메일별로 분리된 로컬 텍스트 보관함입니다. 공간 안에서 카테고리를 만들고 자동 저장과 JSON 백업/복원을 할 수 있습니다.')});
-$('fileMenu').addEventListener('click',()=>{if(confirm('JSON 백업 파일을 만들까요?'))exportBackup()});$('editMenu').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x);else openItemDialog()});$('viewMenu').addEventListener('click',()=>{filter='all';$('searchInput').value='';query='';render();toast('All items · 전체 항목')});$('helpMenu').addEventListener('click',()=>$('startHelp').click());
+$('fileMenu').addEventListener('click',openImportDialog);$('editMenu').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x);else openItemDialog()});$('viewMenu').addEventListener('click',()=>{filter='all';$('searchInput').value='';query='';render();toast('All items · 전체 항목')});$('helpMenu').addEventListener('click',()=>$('startHelp').click());
 document.addEventListener('click',e=>{if(!$('startMenu').contains(e.target)&&e.target!==$('startBtn'))$('startMenu').classList.remove('open')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeItemDialog();closeCategoryDialog();$('manualCopyScrim').classList.remove('open');closeImportDialog();$('startMenu').classList.remove('open')}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='n'){e.preventDefault();openItemDialog()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();exportBackup()}});
 // Draggable classic desktop window. Pointer capture is limited to the title bar.
