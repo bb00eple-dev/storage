@@ -298,6 +298,92 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
 .boot-track span{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,#d8c3c6 0 12px,#f1e4e6 12px 15px);animation:bootProgress .62s steps(8,end) forwards}
 @keyframes bootProgress{to{width:100%}}
 
+
+
+/* Stable archive layout: keep the action dock visible and let only the list scroll. */
+#appWindow .mainarea{flex:1 1 0;min-height:0;overflow:hidden}
+#appWindow .content-panel{display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+#appWindow .content-panel > .pathbar,
+#appWindow .content-panel > .content-toolbar,
+#appWindow .content-panel > .list-head{flex:0 0 auto;position:relative;z-index:1}
+#appWindow .content-panel > .pathbar{min-height:28px}
+#appWindow .content-panel > .content-toolbar{min-height:38px;flex-wrap:nowrap;overflow:hidden}
+#appWindow .content-toolbar .hint{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appWindow .content-toolbar .mini-btn{flex:0 0 auto;max-width:48%;overflow:hidden;text-overflow:ellipsis}
+#appWindow .content-panel > .list-head{min-height:42px;padding:5px 9px;align-items:center}
+#appWindow .list-head > span:first-child{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;line-height:1.15;min-width:0}
+#appWindow .list-head > span:first-child .gloss{display:block;margin:0;white-space:nowrap;font-size:9px}
+#appWindow .list-head-category{min-width:0;white-space:nowrap}
+#appWindow .list-head-category .gloss{white-space:nowrap;word-break:keep-all}
+#appWindow .entries{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain}
+#appWindow .preview{
+  flex:0 0 112px;height:112px;min-height:112px;max-height:112px;
+  display:grid;grid-template-columns:minmax(0,1fr) 82px 44px;
+  align-items:center;gap:9px;padding:8px 10px;overflow:hidden;
+}
+#appWindow .preview-content{min-width:0;min-height:0;max-height:100%;overflow:hidden}
+#appWindow .preview-label{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+#appWindow .preview-text{max-height:4.4em;min-height:0;overflow:auto;overflow-wrap:anywhere;word-break:break-word}
+#appWindow .preview-actions{width:82px;min-width:82px;max-width:82px;display:flex;flex-direction:column;justify-content:center;gap:5px;align-items:stretch;flex-shrink:0}
+#appWindow .preview-actions button{width:100%;min-width:0;min-height:29px;flex:0 0 auto;white-space:nowrap}
+#appWindow .preview-add{
+  width:42px;height:42px;min-width:42px;min-height:42px;padding:0;
+  display:grid;place-items:center;border-radius:50%;
+  border:1px solid #d8c9c6;border-top-color:#fff;border-left-color:#fff;
+  background:linear-gradient(145deg,#fffafb,#fff3f5);color:#8f7b76;
+  box-shadow:1px 2px 0 #d8d1c7;font-size:25px;line-height:1;
+  align-self:end;justify-self:end;cursor:pointer;flex:0 0 42px;
+}
+#appWindow .preview-add:hover{background:#fff0f2;border-color:#dfcacc;color:#a17b83}
+#appWindow .preview-add:active{transform:translate(1px,1px);box-shadow:none}
+#appWindow .statusbar{flex:0 0 23px;position:relative;z-index:2}
+
+/* Narrow screens: two fixed action buttons plus the round add shortcut on the bottom row. */
+@media(max-width:700px){
+  #appWindow .content-panel > .content-toolbar{min-height:40px}
+  #appWindow .content-toolbar .hint{white-space:normal;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  #appWindow .content-toolbar .mini-btn{max-width:46%;min-height:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;white-space:nowrap;line-height:1.1}
+  #appWindow .content-toolbar .mini-btn .gloss{display:block;margin:0;font-size:8px;white-space:nowrap}
+  #appWindow .content-panel > .list-head{min-height:42px;grid-template-columns:minmax(0,1fr) 88px;padding:5px 7px}
+  #appWindow .list-head-category{width:88px;min-width:88px;align-items:center;text-align:center}
+  #appWindow .list-head-category > span{white-space:nowrap;word-break:keep-all}
+  #appWindow .list-head-category .gloss{display:block;white-space:nowrap;word-break:keep-all}
+  #appWindow .entry{grid-template-columns:minmax(0,1fr) 88px}
+  #appWindow .entry-copy-btn{width:76px;height:28px}
+  #appWindow .preview{
+    flex-basis:120px;height:120px;min-height:120px;max-height:120px;
+    grid-template-columns:minmax(0,1fr) 44px;grid-template-rows:minmax(0,1fr) 38px;
+    gap:5px 7px;padding:7px 8px;
+  }
+  #appWindow .preview-content{grid-column:1 / -1;grid-row:1}
+  #appWindow .preview-text{max-height:3.1em}
+  #appWindow .preview-actions{grid-column:1;grid-row:2;width:auto;min-width:0;max-width:100%;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:6px}
+  #appWindow .preview-actions button{width:auto;min-width:76px;min-height:30px;padding:3px 8px;flex:0 0 auto}
+  #appWindow .preview-add{grid-column:2;grid-row:2;align-self:center;justify-self:end;width:38px;height:38px;min-width:38px;min-height:38px;flex-basis:38px;font-size:23px}
+}
+@media(max-width:420px){
+  #appWindow .content-panel > .list-head{grid-template-columns:minmax(0,1fr) 82px}
+  #appWindow .list-head-category{width:82px;min-width:82px}
+  #appWindow .entry{grid-template-columns:minmax(0,1fr) 82px}
+  #appWindow .entry-copy-btn{width:72px;height:27px}
+}
+/* Very short viewports keep the action dock fixed instead of letting it collapse behind the status bar. */
+@media(max-height:560px){
+  #appWindow .preview{flex-basis:96px;height:96px;min-height:96px;max-height:96px;padding:5px 7px}
+  #appWindow .preview-text{max-height:2.8em;font-size:12px;line-height:1.25}
+  #appWindow .preview-actions button{min-height:25px}
+  #appWindow .statusbar{flex-basis:20px;height:20px}
+}
+@media(max-height:420px){
+  #appWindow .content-panel > .pathbar,
+  #appWindow .content-panel > .content-toolbar,
+  #appWindow .content-panel > .list-head,
+  #appWindow .statusbar{display:flex!important}
+  #appWindow .preview{flex-basis:86px;height:86px;min-height:86px;max-height:86px}
+  #appWindow .preview-add{width:34px;height:34px;min-width:34px;min-height:34px;flex-basis:34px;font-size:20px}
+  #appWindow .preview-actions button{min-width:62px;min-height:23px;font-size:10px}
+}
+
 </style>
 </head>
 <body>
@@ -388,6 +474,7 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
         <div class="preview">
           <div class="preview-content"><div class="preview-label" id="previewLabel">No item selected <small class="gloss">선택된 항목 없음</small></div><div class="preview-text" id="previewText">카테고리를 만들고 텍스트를 추가해 보세요. ♡</div></div>
           <div class="preview-actions"><button id="editBtn" disabled>Edit <small class="gloss">수정</small></button><button id="deleteBtn" disabled>Delete <small class="gloss">삭제</small></button></div>
+          <button class="preview-add" id="floatingAddBtn" type="button" aria-label="새 항목 추가" title="Add item · 새 항목 추가">＋</button>
         </div>
       </main>
     </div>
@@ -590,7 +677,7 @@ $('logoutBtn').addEventListener('click',leaveSpace);
 document.querySelectorAll('.navbtn[data-filter]').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
 $('categoryNav').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(b)setFilter(b.dataset.filter)});
 $('searchInput').addEventListener('input',e=>{query=e.target.value;renderList(true)});
-$('newBtn').addEventListener('click',()=>openItemDialog());$('saveItem').addEventListener('click',saveItem);$('cancelItem').addEventListener('click',closeItemDialog);
+$('newBtn').addEventListener('click',()=>openItemDialog());$('floatingAddBtn').addEventListener('click',()=>openItemDialog());$('saveItem').addEventListener('click',saveItem);$('cancelItem').addEventListener('click',closeItemDialog);
 $('itemScrim').addEventListener('click',e=>{if(e.target===$('itemScrim'))closeItemDialog()});$('closeManualCopy').addEventListener('click',()=>$('manualCopyScrim').classList.remove('open'));$('selectCopyText').addEventListener('click',()=>{$('manualCopyText').focus();$('manualCopyText').select()});$('manualCopyScrim').addEventListener('click',e=>{if(e.target===$('manualCopyScrim'))$('manualCopyScrim').classList.remove('open')});
 $('editBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x)});
 $('deleteBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;if(!confirm(`'${x.name}' 항목을 삭제할까요?`))return;items=items.filter(y=>y.id!==x.id);selectedId=null;persist();renderList(false);toast('Item deleted · 항목 삭제 완료')});
