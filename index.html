@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fffefa">
+<title>cotton.zip - text archive</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="cotton.zip">
+<style>
+:root{
+  --desktop:#fffefa;
+  --cream:#fffef7;
+  --pink:#fffafb;
+  --line:#e8e5dc;
+  --line-pink:#eee1e4;
+  --chrome:#d8d6d0;
+  --chrome-light:#fff;
+  --chrome-dark:#77756f;
+  --ink:#373630;
+  --muted:#88857d;
+  --soft:#f8f6f0;
+  --soft-pink:#fff7f8;
+  --shadow:rgba(53,48,41,.13);
+  --pixel:rgba(124,112,91,.045);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:Galmuri11,"Malgun Gothic",Dotum,sans-serif;font-size:13px;color:var(--ink);background:var(--desktop);overflow:hidden}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:1px dotted #8b8173;outline-offset:2px}
+.desktop{position:relative;height:100%;min-height:420px;overflow:hidden;background-color:var(--desktop);background-image:radial-gradient(var(--pixel) .7px,transparent .8px);background-size:8px 8px}
+.wallpaper-mark{position:absolute;right:28px;top:20px;color:#d9d5ca;font-size:10px;letter-spacing:1px;user-select:none}
+.desktop-icons{position:absolute;left:14px;top:14px;display:grid;gap:15px;width:78px;z-index:1}
+.desktop-icon{width:76px;min-height:66px;border:1px solid transparent;background:transparent;color:#66635c;text-shadow:1px 1px #fff;text-align:center;padding:4px 2px;display:flex;align-items:center;flex-direction:column;gap:4px}
+.desktop-icon:hover,.desktop-icon:focus-visible{background:#f6f4ed;border:1px dotted #bcb7aa;outline:0}
+.desktop-icon span{max-width:74px;line-height:1.15}
+.pixel-icon{width:32px;height:29px;display:grid;place-items:center;filter:drop-shadow(1px 1px 0 #fff)}
+.pixel-icon svg{width:32px;height:29px;image-rendering:pixelated}
+.en{white-space:nowrap}
+.gloss{font-size:9px;color:#99958b;margin-left:3px;font-weight:normal;letter-spacing:0}
+.enblock{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+.enblock .gloss{margin:0;font-size:9px}
+.taskbar{position:absolute;bottom:0;left:0;right:0;height:34px;background:var(--chrome);border-top:2px solid var(--chrome-light);box-shadow:0 -1px 0 #aaa79f;display:flex;align-items:center;gap:5px;padding:3px 5px;z-index:30}
+.start-btn,.task-btn,.tray{height:26px;border:1px solid #aaa79f;border-top-color:#fff;border-left-color:#fff;background:var(--chrome);display:flex;align-items:center;justify-content:center;gap:5px;padding:0 8px}
+.start-btn{min-width:75px;justify-content:flex-start;font-weight:bold}
+.start-btn .tiny-mark{font-size:15px;color:#8c8170}
+.task-btn{font-weight:normal;justify-content:flex-start;min-width:150px;max-width:250px;overflow:hidden;white-space:nowrap}
+.task-btn.active{border:1px solid #85827b;border-bottom-color:#fff;border-right-color:#fff;background:#d0cec8}
+.task-spacer{flex:1}
+.tray{font-weight:normal;min-width:62px;border-color:#aaa79f #fff #fff #aaa79f;padding:0 7px}
+.window{position:absolute;left:50%;top:50%;transform:translate(-50%,-53%);width:min(880px,calc(100vw - 150px));height:min(620px,calc(100vh - 82px));min-width:320px;min-height:390px;background:var(--chrome);border:2px solid;border-color:#fff #65635d #65635d #fff;box-shadow:2px 2px 0 #8d8980,6px 7px 18px var(--shadow);display:flex;flex-direction:column;z-index:5}
+.window.hidden{display:none}
+.window.maximized{left:4px;top:4px;transform:none;width:calc(100vw - 8px);height:calc(100vh - 42px)}
+.titlebar{height:27px;flex:0 0 27px;display:flex;align-items:center;gap:6px;padding:2px 3px 2px 6px;background:linear-gradient(90deg,#fffafb 0%,#fffefc 70%,#fffef7 100%);border-bottom:1px solid #c1bdb5;user-select:none;cursor:move}
+.titlebar-icon{width:17px;height:17px;display:grid;place-items:center;color:#938878;font-size:14px}
+.titlebar-name{font-weight:bold;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#514e47}
+.win-controls{display:flex;gap:2px}
+.win-controls button{width:20px;height:19px;padding:0;border:1px solid #aaa79f;border-top-color:#fff;border-left-color:#fff;background:var(--chrome);font-weight:bold;line-height:15px;font-family:Arial,sans-serif;font-size:12px}
+.win-controls button:active{border-color:#85827b #fff #fff #85827b}
+.menubar{height:25px;display:flex;align-items:center;gap:1px;padding:0 5px;border-bottom:1px solid #aaa69f;flex:0 0 25px}
+.menuitem{padding:4px 7px;cursor:pointer;line-height:1}
+.menuitem:hover,.menuitem:focus{background:#f5f2e9;outline:1px dotted #99958b}
+.menuitem .gloss{font-size:8px}
+.toolbar{min-height:42px;display:flex;align-items:center;gap:5px;padding:5px 7px;border-bottom:1px solid #aaa69f;flex:0 0 auto;flex-wrap:wrap}
+.toolbtn{min-height:27px;padding:3px 7px;border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:2px;color:#4c4a44}
+.toolbtn:hover{background:#f7f5ef;border-color:#e5e1d7}
+.toolbtn:active,.toolbtn.pressed{background:#efede6;border-color:#bcb8ae}
+.toolbtn:disabled{opacity:.38;cursor:default}
+.toolbtn .toolglyph{font-size:14px;color:#847968}
+.tool-sep{height:21px;width:1px;background:#b6b2a9;border-right:1px solid #fff;margin:0 2px}
+.search-wrap{margin-left:auto;display:flex;align-items:center;gap:5px;max-width:230px;min-width:105px;flex:1}
+.search-wrap input{width:100%;height:25px;border:1px solid #aaa79f;border-top-color:#77746d;border-left-color:#77746d;background:#fff;padding:3px 6px;outline:none}
+.mainarea{flex:1;min-height:0;display:grid;grid-template-columns:176px minmax(0,1fr);gap:7px;padding:7px}
+.sidebar,.content-panel{background:#fff;border:1px solid #aaa79f;border-top-color:#77746d;border-left-color:#77746d;min-height:0;min-width:0}
+.sidebar{padding:7px 5px;display:flex;flex-direction:column;gap:3px;background:#fffefa;overflow-y:auto}
+.side-heading{font-size:10px;font-weight:bold;color:#777268;padding:5px 6px 7px;border-bottom:1px dotted #d8d2c7;margin-bottom:3px;letter-spacing:.3px}
+.navbtn{min-height:28px;border:1px solid transparent;background:transparent;text-align:left;padding:4px 6px;display:flex;align-items:center;gap:7px;min-width:0;width:100%;border-radius:2px}
+.navbtn:hover{background:#f8f6f0;border-color:#ece8df}
+.navbtn.active{background:var(--soft-pink);border:1px dotted #d9c8cb}
+.navbtn .navico{width:15px;flex:0 0 15px;text-align:center;font-size:13px;color:#8b8170}
+.navbtn .navname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.navbtn .navcount{font-size:9px;color:#aaa59b}
+.side-rule{border-top:1px dotted #ddd8cf;margin:6px 2px 3px}
+.side-bottom{margin-top:auto;border-top:1px dotted #d8d2c7;padding:8px 5px 3px;color:#888379;line-height:1.5;font-size:10px}
+.side-bottom button{margin-top:7px;width:100%;text-align:left;background:transparent;border:0;padding:3px 1px;color:#665f54}
+.side-bottom button:hover{color:#a17b83}
+.content-panel{display:flex;flex-direction:column;padding:0;background:#fff;overflow:hidden}
+.pathbar{height:28px;flex:0 0 28px;background:#fdfcf8;border-bottom:1px solid #e3ded4;display:flex;align-items:center;padding:0 8px;gap:6px;color:#777168;min-width:0}
+.pathbar strong{color:#514e47;font-weight:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.content-toolbar{min-height:35px;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #eee9df;flex-wrap:wrap}
+.content-toolbar .hint{font-size:10px;color:#888277;min-width:0}
+.mini-btn{min-height:24px;padding:3px 8px;border:1px solid #d9d5cc;background:#fffefa;border-radius:2px;white-space:nowrap}
+.mini-btn:hover{background:#f8f6f0;border-color:#c8c1b5}
+.list-head{display:grid;grid-template-columns:minmax(0,1fr) 112px 64px;gap:5px;align-items:center;padding:6px 9px;background:#f7f6f1;border-bottom:1px solid #e2ded5;color:#77736b;font-size:10px}
+.list-head-category{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;text-align:center;line-height:1.15}
+.list-head-category .gloss{display:block;margin:0;font-size:9px;white-space:nowrap}
+.entries{overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;flex:1;min-height:0;padding:3px 5px;overflow-anchor:none}
+.entry{width:100%;min-height:44px;display:grid;grid-template-columns:minmax(0,1fr) 112px 64px;gap:5px;align-items:center;border:1px solid transparent;background:#fff;padding:5px 6px;min-width:0}
+.entry:hover{background:#faf9f5;border-color:#eee9df}
+.entry.selected{background:#f8f6f0;border:1px dotted #aaa69c}
+.entry-main{min-width:0;max-width:100%;width:100%;display:flex;align-items:center;gap:8px}
+.entry-select{border:0;background:transparent;padding:0;min-height:32px;text-align:left;cursor:pointer}
+.entry-select:hover{background:transparent}
+.entry-fileicon{font-size:14px;flex:0 0 18px;color:#9b907f;text-align:center}
+.entry-copy{min-width:0;display:block;flex:1}
+.entry-name{display:block;font-size:11px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-copy-btn{width:96px;height:30px;justify-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #d9d5cc;border-top-color:#fff;border-left-color:#fff;background:#fff8f9;color:#665b59;padding:2px 5px;line-height:1;white-space:nowrap}
+.entry-copy-btn:hover{background:#fff1f3;border-color:#d9c9ca}
+.entry-copy-btn:active{border-color:#aaa79f #fff #fff #aaa79f;transform:translate(1px,1px)}
+.entry-copy-btn .gloss{font-size:8px;margin:0}
+.entry-date{font-size:10px;color:#888277;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.preview{border-top:1px solid #dedbd2;background:#fffefa;padding:8px 10px;min-height:94px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.preview-content{min-width:0}
+.preview-label{font-size:10px;color:#888277;margin-bottom:5px}
+.preview-text{font-size:14px;line-height:1.55;overflow-wrap:anywhere;white-space:pre-wrap;color:#4c4942;max-height:82px;overflow:auto}
+.preview-actions{display:flex;flex-direction:column;gap:4px;align-items:stretch}
+.preview-actions button{min-width:62px;min-height:24px;border:1px solid #d8d4cb;background:#fff;padding:2px 7px;border-radius:2px}
+.preview-actions button:hover{background:#f8f6f0}
+.preview-actions button:disabled{opacity:.4;cursor:default}
+.preview-actions .copy-primary{background:#fff8f9;border-color:#eadde0}
+.statusbar{height:23px;flex:0 0 23px;border-top:1px solid #fff;display:flex;align-items:center;gap:10px;padding:2px 7px;color:#77736b;font-size:10px;min-width:0}
+.status-cell{border:1px solid #aaa79f;border-top-color:#77746d;border-left-color:#77746d;padding:2px 6px;min-width:70px}
+.empty-state{padding:30px 12px;text-align:center;color:#898378;line-height:1.9}
+.empty-state .big{font-size:22px;color:#c7b8a9}
+.start-menu{position:absolute;left:5px;bottom:34px;width:205px;background:var(--chrome);border:2px solid;border-color:#fff #77746d #77746d #fff;box-shadow:3px 3px 8px var(--shadow);z-index:40;padding:4px;display:none}
+.start-menu.open{display:block}
+.start-brand{background:linear-gradient(#fffafb,#fffef7);height:43px;display:flex;align-items:center;padding:7px;font-weight:bold;font-size:13px;border:1px solid #d3cec3;margin-bottom:4px}
+.start-option{width:100%;min-height:31px;text-align:left;border:0;background:transparent;padding:4px 8px;display:flex;align-items:center;gap:9px}
+.start-option:hover{background:#f2efe7}
+.scrim{position:absolute;inset:0;background:rgba(74,70,62,.12);z-index:50;display:none;align-items:center;justify-content:center;padding:14px}
+.scrim.open{display:flex}
+.dialog{width:min(430px,100%);max-height:calc(100% - 24px);overflow:auto;background:var(--chrome);border:2px solid;border-color:#fff #65635d #65635d #fff;box-shadow:4px 5px 15px var(--shadow);padding:3px}
+.dialog-title{min-height:25px;background:linear-gradient(90deg,#fffafb,#fffef7);display:flex;align-items:center;padding:4px 7px;font-weight:bold;margin-bottom:7px}
+.dialog-body{padding:7px 10px 10px;display:grid;gap:9px}
+.field{display:grid;gap:4px;min-width:0}.field label{font-size:11px;color:#625e55}
+.field input,.field textarea,.field select{width:100%;min-width:0;background:#fff;border:1px solid #aaa79f;border-top-color:#77746d;border-left-color:#77746d;padding:7px;outline:none;border-radius:0}
+.field textarea{min-height:94px;resize:vertical}
+.dialog-actions{display:flex;justify-content:flex-end;gap:6px;padding:4px 9px 8px;flex-wrap:wrap}
+.dialog-actions button{min-height:25px;padding:3px 10px;border:1px solid #d3cec4;background:#fffefa}
+.dialog-actions button.primary{background:#fff8f9;border-color:#e8dadd}
+.dialog-note{font-size:10px;color:#777168;line-height:1.6}
+.category-list{display:grid;gap:5px;max-height:190px;overflow:auto}
+.category-row{display:flex;align-items:center;gap:6px;padding:5px 6px;background:#fffefa;border:1px solid #e8e4db;min-width:0}
+.category-row .cat-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.category-row button{border:0;background:transparent;padding:3px 6px;color:#777168;min-width:25px}
+.category-row button:hover{background:#f5f2eb}
+.inline-add{display:flex;gap:6px;align-items:center;min-width:0}
+.inline-add input{flex:1;min-width:0;height:27px;border:1px solid #aaa79f;border-top-color:#77746d;border-left-color:#77746d;padding:4px 6px}
+.inline-add button{height:27px;padding:2px 9px;background:#fff8f9;border:1px solid #e8dadd}
+@media(max-width:700px){
+ .desktop-icons,.wallpaper-mark{display:none}
+ .window{left:4px;top:4px;transform:none;width:calc(100vw - 8px);height:calc(100vh - 42px);min-width:0;min-height:0}
+ .window.maximized{left:2px;top:2px;width:calc(100vw - 4px);height:calc(100vh - 40px)}
+ .mainarea{grid-template-columns:clamp(105px,29vw,150px) minmax(0,1fr);gap:5px;padding:5px}
+ .sidebar{padding:5px 3px}.navbtn{padding:4px 3px;gap:4px;font-size:11px}.navbtn .navico{width:13px;flex-basis:13px}
+ .toolbar{gap:2px;padding:4px}.toolbtn{padding:3px 5px}.tool-label{display:none}.search-wrap{max-width:145px;min-width:90px}
+ .list-head,.entry{grid-template-columns:minmax(0,1fr) 76px}.list-head > span:last-child,.entry-date{display:none}
+ .entry-copy-btn{width:68px;height:27px;font-size:9px}.preview{grid-template-columns:minmax(0,1fr);gap:7px}.preview-actions{flex-direction:row;flex-wrap:wrap}.preview-actions button{flex:1;min-width:55px}
+ .task-btn{min-width:38px;width:38px;max-width:38px;overflow:hidden}.task-btn .task-full{display:none}
+}
+@media(max-width:420px){
+ .menubar{padding:0 2px}.menuitem{padding:4px 4px;font-size:11px}.menuitem .gloss{font-size:8px}
+ .mainarea{grid-template-columns:92px minmax(0,1fr)}.side-heading{font-size:9px;padding-left:3px}.navbtn{font-size:10px}.navbtn .navico{display:none}.navbtn .navcount{display:none}
+ .content-toolbar{padding:4px 5px}.content-toolbar .hint{font-size:9px}.list-head{grid-template-columns:minmax(0,1fr) 72px;padding:6px}.entry{grid-template-columns:minmax(0,1fr) 72px;padding:5px 4px}.entry-copy-btn{width:66px;height:26px}.entry-main{gap:4px}.entry-fileicon{flex-basis:14px}
+ .statusbar{gap:5px;font-size:9px}.statusbar span:last-child{display:none}
+}
+@media(max-height:510px){.window{height:calc(100vh - 45px);top:3px;transform:translateX(-50%);min-height:0}.window.maximized{transform:none}.preview{min-height:70px;padding:5px 8px}.preview-text{max-height:55px}.desktop-icons{gap:5px}}
+
+/* Layout safety pass: keep the application above the taskbar and let text reflow. */
+html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
+.desktop{height:100vh;height:100dvh;min-height:0;overflow:hidden;isolation:isolate}
+.window{
+  left:50%;right:auto;top:10px;bottom:42px;transform:translateX(-50%);
+  width:min(980px,calc(100vw - 104px));height:auto;max-height:none;
+  min-width:0;min-height:0;overflow:hidden;
+}
+.window.maximized{left:4px;right:4px;top:4px;bottom:42px;transform:none;width:auto;height:auto;min-width:0;min-height:0}
+.mainarea{min-height:0;min-width:0;grid-template-columns:minmax(132px,25%) minmax(0,1fr)}
+.sidebar,.content-panel,.entries,.preview,.preview-content{min-width:0;min-height:0}
+.content-panel{overflow:hidden}
+.entries{flex:1 1 auto;overflow:auto;overscroll-behavior:contain;overflow-anchor:none}
+.preview{grid-template-columns:minmax(0,1fr) minmax(70px,auto);align-items:center;min-width:0;max-width:100%}
+.preview-content{width:100%;max-width:100%;overflow:hidden}
+.preview-label{overflow-wrap:anywhere;line-height:1.35}
+.preview-text{display:block;width:100%;max-width:100%;min-width:0;max-height:7em;overflow:auto;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap;line-height:1.45}
+.preview-actions{min-width:70px;max-width:100%;flex-shrink:0}
+.preview-actions button{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.entry-main,.entry-copy,.entry-name{min-width:0;max-width:100%}
+.list-head,.entry{min-width:0}
+.dialog{min-width:0}
+@media(max-width:850px){.desktop-icons,.wallpaper-mark{display:none}}
+@media(max-width:700px){
+  .window{left:4px;right:4px;top:4px;bottom:38px;transform:none;width:auto;height:auto;min-width:0;min-height:0}
+  .mainarea{grid-template-columns:minmax(100px,28%) minmax(0,1fr);gap:5px;padding:5px}
+  .toolbar{flex-wrap:wrap;min-width:0}
+  .search-wrap{min-width:90px;max-width:180px}
+  .preview{grid-template-columns:minmax(0,1fr) 70px;gap:6px;align-items:start}
+  .preview-actions{display:flex;flex-direction:column;min-width:64px}
+  .preview-text{max-height:6em}
+}
+@media(max-width:480px){
+  .mainarea{grid-template-columns:86px minmax(0,1fr);gap:4px;padding:4px}
+  .sidebar{padding:4px 2px}
+  .side-heading{padding:4px 3px;font-size:9px;white-space:normal;line-height:1.3}
+  .navbtn{gap:3px;padding:4px 2px;font-size:10px;align-items:flex-start;min-height:30px}
+  .navbtn .navico{display:none}
+  .navbtn .navname{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.2}
+  .navbtn .navname .gloss{display:block;margin:1px 0 0;font-size:8px;white-space:normal}
+  .navbtn .navcount{display:none}
+  .preview{grid-template-columns:minmax(0,1fr);gap:5px}
+  .preview-actions{flex-direction:row;min-width:0;width:100%;flex-wrap:wrap}
+  .preview-actions button{flex:1 1 0;min-width:0}
+  .content-toolbar{align-items:flex-start}
+  .content-toolbar .hint{overflow-wrap:anywhere}
+}
+/* Short/zoomed viewports: compact the chrome instead of letting it cover content. */
+@media(max-height:560px){
+  .window{top:3px;bottom:38px;min-height:0}
+  .titlebar{height:23px;flex-basis:23px}
+  .menubar{height:21px;flex-basis:21px}
+  .toolbar{min-height:31px;padding:2px 4px;gap:2px}
+  .toolbtn{min-height:23px;padding:2px 4px}
+  .mainarea{gap:4px;padding:4px}
+  .pathbar{height:23px;flex-basis:23px}
+  .content-toolbar{min-height:26px;padding:3px 5px}
+  .list-head{padding:3px 6px}
+  .preview{min-height:58px;padding:5px;gap:5px}
+  .preview-text{max-height:4.8em;font-size:12px;line-height:1.3}
+  .preview-actions button{min-height:22px;padding:2px 4px;font-size:10px}
+  .statusbar{height:19px;flex-basis:19px;gap:5px;padding:1px 5px}
+  .side-bottom{padding:5px 3px 2px;font-size:9px}
+}
+@media(max-height:420px){
+  .menubar,.pathbar,.content-toolbar,.list-head,.statusbar{display:none}
+  .titlebar{height:21px;flex-basis:21px}
+  .toolbar{height:29px;min-height:29px;flex:0 0 29px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
+  .toolbar .tool-label{display:none}
+  .toolbar .toolbtn{flex:0 0 auto}
+  .search-wrap{min-width:75px;max-width:140px}
+  .mainarea{grid-template-columns:minmax(76px,23%) minmax(0,1fr);padding:3px;gap:3px}
+  .sidebar{padding:3px 2px;overflow:auto}
+  .side-heading{padding:3px;font-size:8px}
+  .navbtn{min-height:22px;padding:2px;font-size:9px}
+  .side-bottom{margin-top:5px;padding:4px 2px;font-size:8px}
+  .content-panel{min-height:0}
+  .entries{min-height:0;flex:1 1 0}
+  .preview{min-height:43px;grid-template-columns:minmax(0,1fr) auto;padding:3px;gap:4px}
+  .preview-label{display:none}
+  .preview-text{max-height:2.5em;font-size:10px;line-height:1.2}
+  .preview-actions{min-width:46px;gap:2px}
+  .preview-actions button{min-width:44px;min-height:20px;padding:1px 3px;font-size:9px}
+}
+
+
+/* Login window: same classic cotton.zip window chrome as the accepted archive design. */
+.login-window{z-index:18;left:50%;right:auto;top:50%;bottom:auto;transform:translate(-50%,-50%);width:min(430px,calc(100vw - 28px));height:auto;max-height:calc(100dvh - 58px);min-width:0;min-height:0;overflow:hidden}
+.login-window .titlebar{cursor:default}
+.login-inside{padding:18px 20px 15px;background:linear-gradient(135deg,#fffefa 0%,#fffafb 62%,#fffef7 100%);border:1px solid #e9e3d9;display:grid;gap:13px}
+.login-brand{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px dotted #d9d1c5}
+.login-flower{width:43px;height:43px;flex:0 0 43px;display:grid;place-items:center;background:#fff8f9;border:1px solid #eadde0;box-shadow:2px 2px 0 #e4dfd5;color:#b69ca0;font-size:25px}
+.login-brand h1{font-size:17px;line-height:1.35;margin:0;font-weight:bold;color:#575148}
+.login-brand p{font-size:10px;line-height:1.6;margin:2px 0 0;color:#958d81}
+.login-form{display:grid;gap:10px}
+.login-form .field{gap:5px}
+.login-form .field label{font-size:11px;color:#625e55}
+.login-input{height:34px!important;padding:6px 8px!important;background:#fff!important}
+.login-password-wrap{display:flex;align-items:stretch;min-width:0}
+.login-password-wrap input{flex:1;min-width:0;border-right:0!important}
+.password-eye{width:37px;flex:0 0 37px;display:grid;place-items:center;border:1px solid #aaa79f;border-top-color:#77746d;border-left-color:#aaa79f;background:#f7f5ef;color:#80796d;padding:0}
+.password-eye:hover{background:#fff8f9;color:#a17b83}
+.password-eye svg{width:17px;height:17px;display:block}
+.login-submit{min-height:34px;border:1px solid #d9c9ca;border-top-color:#fff;border-left-color:#fff;background:linear-gradient(#fffafb,#fff4f6);color:#62565a;padding:6px 12px;box-shadow:1px 1px 0 #c7bdb4;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:bold}
+.login-submit:active{box-shadow:none;transform:translate(1px,1px)}
+.login-hint{font-size:10px;color:#8b8378;line-height:1.7;padding:8px 9px;background:#fffefa;border:1px dotted #e3ddd2}
+.login-error{min-height:15px;font-size:10px;color:#a36f79;line-height:1.5}
+.login-footer{font-size:9px;color:#a19a8e;text-align:center;line-height:1.6}
+.login-account{border-top:1px dotted #d8d2c7;margin-top:6px;padding-top:7px;display:grid;gap:5px;min-width:0}
+.login-account-email{font-size:9px;color:#938b80;overflow-wrap:anywhere;line-height:1.4}
+.login-logout{width:max-content;max-width:100%;border:0;background:transparent;padding:3px 0;color:#756b60;font-size:10px;text-align:left}
+.login-logout:hover{color:#a17b83;text-decoration:underline}
+@media(max-width:480px){.login-inside{padding:14px 13px 12px;gap:10px}.login-brand h1{font-size:15px}.login-flower{width:38px;height:38px;flex-basis:38px}}
+
+
+.boot-screen{position:absolute;inset:0;z-index:35;display:grid;place-items:center;padding:18px;background:var(--desktop);background-image:radial-gradient(var(--pixel) .7px,transparent .8px);background-size:8px 8px;opacity:1;visibility:visible;transition:opacity .24s ease,visibility .24s ease}
+.boot-screen.finished{opacity:0;visibility:hidden;pointer-events:none}
+.boot-panel{width:min(390px,100%);padding:3px;background:var(--chrome);border:2px solid;border-color:#fff #65635d #65635d #fff;box-shadow:3px 4px 12px var(--shadow)}
+.boot-title{height:25px;display:flex;align-items:center;padding:3px 7px;background:linear-gradient(90deg,#fffafb,#fffef7);font-weight:bold;color:#514e47}
+.boot-body{padding:20px 17px 17px;text-align:center;background:#fffefa;border:1px solid #d8d2c7;margin-top:3px}
+.boot-mark{font-size:25px;color:#b9a4a2;margin-bottom:7px}
+.boot-heading{font-size:14px;font-weight:bold;color:#59544c}
+.boot-sub{font-size:10px;color:#948c80;line-height:1.6;margin-top:4px}
+.boot-track{height:9px;margin:16px 0 8px;border:1px solid #c8c2b7;background:#f1efe9;padding:1px;overflow:hidden}
+.boot-track span{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,#d8c3c6 0 12px,#f1e4e6 12px 15px);animation:bootProgress .62s steps(8,end) forwards}
+@keyframes bootProgress{to{width:100%}}
+
+</style>
+</head>
+<body>
+<div class="desktop" id="desktop">
+  <div class="wallpaper-mark">cotton.zip · soft pixel desktop</div>
+  <div class="desktop-icons">
+    <button class="desktop-icon" id="desktopArchive" title="텍스트 보관함 열기">
+      <div class="pixel-icon"><svg viewBox="0 0 34 30" shape-rendering="crispEdges" aria-hidden="true"><path fill="#b9a58e" d="M5 3h23v24H5z"/><path fill="#fff" d="M7 5h19v20H7z"/><path fill="#fff5f7" d="M7 5h19v5H7z"/><path fill="#d4c6ad" d="M10 13h13v2H10zm0 4h13v2H10zm0 4h9v2h-9z"/></svg></div>
+      <span class="enblock"><span>Text Archive</span><small class="gloss">텍스트 보관함</small></span>
+    </button>
+    <button class="desktop-icon" id="desktopComputer" title="내 컴퓨터">
+      <div class="pixel-icon"><svg viewBox="0 0 34 30" shape-rendering="crispEdges" aria-hidden="true"><path fill="#797a7d" d="M3 3h28v19H3z"/><path fill="#fff" d="M5 5h24v15H5z"/><path fill="#dce6e9" d="M8 8h18v10H8z"/><path fill="#85837b" d="M14 22h6v3h5v2H9v-2h5z"/></svg></div>
+      <span class="enblock"><span>My Computer</span><small class="gloss">내 컴퓨터</small></span>
+    </button>
+  </div>
+
+  <section class="window login-window" id="loginWindow" aria-label="cotton.zip 로그인">
+    <div class="titlebar">
+      <div class="titlebar-icon">✿</div>
+      <div class="titlebar-name">cotton.zip <span class="gloss">공간 입장</span></div>
+    </div>
+    <div class="login-inside">
+      <div class="login-brand">
+        <div class="login-flower">✿</div>
+        <div><h1>Welcome to cotton.zip</h1><p>나만의 작은 텍스트 보관함에 입장해요.</p></div>
+      </div>
+      <form class="login-form" id="loginForm">
+        <div class="field">
+          <label for="loginEmail">Email <small class="gloss">이메일</small></label>
+          <input class="login-input" id="loginEmail" type="email" autocomplete="username" maxlength="180" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password <small class="gloss">비밀번호</small></label>
+          <div class="login-password-wrap">
+            <input class="login-input" id="loginPassword" type="password" autocomplete="current-password" maxlength="128" placeholder="비밀번호를 입력하세요" required>
+            <button class="password-eye" id="togglePassword" type="button" aria-label="비밀번호 보기" aria-pressed="false" title="비밀번호 표시 / 숨기기">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="login-error" id="loginError" role="status" aria-live="polite"></div>
+        <button class="login-submit" id="loginSubmit" type="submit">Enter my space <small class="gloss">내 공간 입장</small></button>
+      </form>
+      <div class="login-hint" id="loginHint">처음 사용하는 이메일이면 새 공간이 만들어져요.<br>같은 이메일과 비밀번호로 다시 로그인하면 저장한 자료가 열립니다.</div>
+      <div class="login-footer">LOCAL SPACE · 이 브라우저에 저장됩니다</div>
+    </div>
+  </section>
+
+  <section class="window hidden" id="appWindow" aria-label="cotton.zip 텍스트 보관함">
+    <div class="titlebar" id="titlebar">
+      <div class="titlebar-icon">✿</div><div class="titlebar-name">cotton.zip <span class="gloss">텍스트 보관함</span></div>
+      <div class="win-controls"><button id="minBtn" aria-label="최소화" title="최소화">_</button><button id="maxBtn" aria-label="최대화" title="최대화">□</button><button id="closeBtn" aria-label="닫기" title="닫기">×</button></div>
+    </div>
+    <div class="menubar">
+      <span class="menuitem" id="fileMenu" tabindex="0"><span class="en">File</span><small class="gloss">파일</small></span>
+      <span class="menuitem" id="editMenu" tabindex="0"><span class="en">Edit</span><small class="gloss">편집</small></span>
+      <span class="menuitem" id="viewMenu" tabindex="0"><span class="en">View</span><small class="gloss">보기</small></span>
+      <span class="menuitem" id="helpMenu" tabindex="0"><span class="en">Help</span><small class="gloss">도움말</small></span>
+    </div>
+    <div class="toolbar">
+      <button class="toolbtn" id="newBtn" title="새 텍스트 추가"><span class="toolglyph">＋</span><span class="tool-label">New<small class="gloss">새 항목</small></span></button>
+      <button class="toolbtn" id="categoryBtn" title="카테고리 관리"><span class="toolglyph">▦</span><span class="tool-label">Category<small class="gloss">분류</small></span></button>
+      <button class="toolbtn" id="favBtn" title="즐겨찾기 설정"><span class="toolglyph">♡</span><span class="tool-label">Favorite<small class="gloss">즐겨찾기</small></span></button>
+      <span class="tool-sep"></span>
+      <button class="toolbtn" id="backupBtn" title="JSON 백업"><span class="toolglyph">↓</span><span class="tool-label">Backup<small class="gloss">백업</small></span></button>
+      <button class="toolbtn" id="importBtn" title="백업 불러오기"><span class="toolglyph">↑</span><span class="tool-label">Import<small class="gloss">불러오기</small></span></button>
+      <div class="search-wrap"><span style="color:#817b70">⌕</span><input id="searchInput" type="search" placeholder="Search... 검색" aria-label="검색"></div>
+    </div>
+    <div class="mainarea">
+      <aside class="sidebar">
+        <div class="side-heading">CATEGORIES <small class="gloss">카테고리</small></div>
+        <button class="navbtn active" data-filter="all"><span class="navico">▤</span><span class="navname">All items <small class="gloss">전체</small></span><span class="navcount" id="allCount">0</span></button>
+        <button class="navbtn" data-filter="favorite"><span class="navico">♡</span><span class="navname">Favorites <small class="gloss">즐겨찾기</small></span><span class="navcount" id="favCount">0</span></button>
+        <button class="navbtn" data-filter="uncategorized"><span class="navico">□</span><span class="navname">Unsorted <small class="gloss">미분류</small></span><span class="navcount" id="uncatCount">0</span></button>
+        <div class="side-rule"></div>
+        <div class="side-heading">MY CATEGORIES <small class="gloss">내 분류</small></div>
+        <div id="categoryNav"></div>
+        <div class="side-bottom">
+        <div class="login-account"><span class="login-account-email" id="accountEmailLabel">로그인된 이메일</span><button class="login-logout" id="logoutBtn" type="button">↪ Log out <small class="gloss">로그아웃</small></button></div>
+        LOCAL ARCHIVE <small class="gloss">브라우저 저장</small><br><span id="sideCount">0 items</span><br><button id="sideAddCategory">＋ Add category <small class="gloss">분류 추가</small></button>
+      </div>
+      </aside>
+      <main class="content-panel">
+        <div class="pathbar"><span>▣</span><strong>My Archive</strong><span>›</span><span id="pathName">All items</span></div>
+        <div class="content-toolbar"><span class="hint" id="resultHint">아직 저장된 텍스트가 없습니다.</span><button class="mini-btn" id="manageCategoryInline">Manage categories <small class="gloss">분류 관리</small></button></div>
+        <div class="list-head"><span>Name <small class="gloss">이름</small></span><span class="list-head-category"><span>Category</span><small class="gloss">분류</small></span><span>Updated <small class="gloss">날짜</small></span></div>
+        <div class="entries" id="entryList" role="list" aria-label="저장된 텍스트 목록"></div>
+        <div class="preview">
+          <div class="preview-content"><div class="preview-label" id="previewLabel">No item selected <small class="gloss">선택된 항목 없음</small></div><div class="preview-text" id="previewText">카테고리를 만들고 텍스트를 추가해 보세요. ♡</div></div>
+          <div class="preview-actions"><button id="editBtn" disabled>Edit <small class="gloss">수정</small></button><button id="deleteBtn" disabled>Delete <small class="gloss">삭제</small></button></div>
+        </div>
+      </main>
+    </div>
+    <div class="statusbar"><span class="status-cell" id="statusCount">0 objects</span><span id="statusMessage">Ready · 준비</span><span style="margin-left:auto">cotton.zip</span></div>
+  </section>
+
+  <div class="start-menu" id="startMenu">
+    <div class="start-brand">✿　cotton.zip</div>
+    <button class="start-option" id="startOpen"><span>▤</span> Open Text Archive <small class="gloss">보관함 열기</small></button>
+    <button class="start-option" id="startBackup"><span>↓</span> Backup archive <small class="gloss">보관함 백업</small></button>
+    <button class="start-option" id="startHelp"><span>ⓘ</span> About this app <small class="gloss">앱 정보</small></button>
+  </div>
+  <div class="taskbar">
+    <button class="start-btn" id="startBtn"><span class="tiny-mark">✿</span> Start <small class="gloss">시작</small></button>
+    <button class="task-btn" id="taskApp"><span>▤</span><span class="task-full">cotton.zip · Text Archive</span></button>
+    <div class="task-spacer"></div><div class="tray"><span>◷</span><span id="clock">--:--</span></div>
+  </div>
+
+  <div class="boot-screen" id="bootScreen" aria-label="cotton.zip 시작 중">
+    <div class="boot-panel">
+      <div class="boot-title">✿ cotton.zip <small class="gloss">system startup · 시작</small></div>
+      <div class="boot-body">
+        <div class="boot-mark">✿</div>
+        <div class="boot-heading">Starting cotton.zip</div>
+        <div class="boot-sub">작은 텍스트 보관함을 준비하고 있어요.</div>
+        <div class="boot-track"><span></span></div>
+        <div class="boot-sub">Checking local space... 로컬 공간 확인 중</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scrim" id="itemScrim" role="dialog" aria-modal="true" aria-labelledby="itemDialogTitle">
+    <div class="dialog">
+      <div class="dialog-title" id="itemDialogTitle">New item <small class="gloss">새 항목</small></div>
+      <div class="dialog-body">
+        <div class="field"><label for="itemText">Content <small class="gloss">내용 · 이름</small></label><textarea id="itemText" maxlength="1500" placeholder="보관할 카오모지, 구분선 또는 문구를 입력하세요."></textarea></div>
+        <div class="field"><label for="itemCategory">Category <small class="gloss">카테고리</small></label><div class="inline-add"><select id="itemCategory" style="flex:1"><option value="">Unsorted · 미분류</option></select><button id="quickAddCategory" type="button">＋</button></div></div>
+        <div class="dialog-note">입력한 내용이 항목 이름으로 표시됩니다. 이 내용은 현재 이메일 공간에 자동 저장돼요.</div>
+      </div>
+      <div class="dialog-actions"><button id="cancelItem">Cancel <small class="gloss">취소</small></button><button class="primary" id="saveItem">Save <small class="gloss">저장</small></button></div>
+    </div>
+  </div>
+
+  <div class="scrim" id="categoryScrim" role="dialog" aria-modal="true" aria-labelledby="categoryDialogTitle">
+    <div class="dialog">
+      <div class="dialog-title" id="categoryDialogTitle">Category settings <small class="gloss">카테고리 설정</small></div>
+      <div class="dialog-body">
+        <div class="field"><label>My categories <small class="gloss">내 카테고리</small></label><div class="category-list" id="categoryList"></div></div>
+        <div class="field"><label for="newCategoryName">Add category <small class="gloss">분류 추가</small></label><div class="inline-add"><input id="newCategoryName" maxlength="28" placeholder="새 카테고리 이름"><button id="addCategory">Add <small class="gloss">추가</small></button></div></div>
+        <div class="dialog-note">카테고리를 삭제해도 그 안의 텍스트는 삭제되지 않고 '미분류'로 이동합니다.</div>
+      </div>
+      <div class="dialog-actions"><button id="closeCategories">Close <small class="gloss">닫기</small></button></div>
+    </div>
+  </div>
+
+  <div class="scrim" id="manualCopyScrim" role="dialog" aria-modal="true" aria-labelledby="manualCopyTitle">
+    <div class="dialog">
+      <div class="dialog-title" id="manualCopyTitle">Copy text <small class="gloss">텍스트 복사</small></div>
+      <div class="dialog-body"><div class="dialog-note">브라우저가 자동 복사를 허용하지 않아 텍스트를 선택해 두었어요. Ctrl+C 또는 길게 눌러 복사해 주세요.</div><div class="field"><textarea id="manualCopyText" readonly aria-label="복사할 텍스트"></textarea></div></div>
+      <div class="dialog-actions"><button id="selectCopyText">Select all <small class="gloss">전체 선택</small></button><button class="primary" id="closeManualCopy">Close <small class="gloss">닫기</small></button></div>
+    </div>
+  </div>
+  <input type="file" id="fileInput" accept=".json,application/json" hidden>
+</div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const SPACES_KEY='cotton_zip_email_spaces_v1';
+const SESSION_KEY='cotton_zip_remembered_email_v1';
+const LEGACY_KEY='cotton_zip_archive_v3';
+let accounts={},currentEmail='',categories=[],items=[],filter='all',query='',selectedId=null,editingId=null;
+function safeLoad(){
+  try{const raw=localStorage.getItem(SPACES_KEY);if(raw){const data=JSON.parse(raw);if(data&&data.accounts&&typeof data.accounts==='object')accounts=data.accounts}}
+  catch(e){console.warn('Could not load email spaces',e)}
+}
+function saveAccounts(){try{localStorage.setItem(SPACES_KEY,JSON.stringify({app:'cotton.zip',version:1,accounts}));return true}catch(e){setStatus('저장 공간을 확인해 주세요.');return false}}
+function makeId(prefix){return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
+function normalizeCategories(arr){const seen=new Set();return arr.filter(x=>x&&typeof x.name==='string').map(x=>({id:String(x.id||makeId('cat')),name:x.name.trim().slice(0,28)})).filter(x=>x.name&&!seen.has(x.name.toLowerCase())&&seen.add(x.name.toLowerCase()))}
+function itemNameFromText(value){const text=String(value||'').trim();const firstLine=text.split(/\r?\n/).map(line=>line.trim()).find(Boolean)||'이름 없는 항목';return firstLine.replace(/\s+/g,' ').slice(0,48)}
+function normalizeItems(arr){return arr.filter(x=>x&&typeof x.text==='string').map((x,i)=>({id:String(x.id||('item-'+i)),name:itemNameFromText(x.text),categoryId:categories.some(c=>c.id===x.categoryId)?x.categoryId:'',text:x.text.slice(0,1500),favorite:!!x.favorite,created:x.created||new Date().toISOString(),updated:x.updated||x.created||new Date().toISOString()}))}
+function persist(){
+  if(!currentEmail||!accounts[currentEmail])return false;
+  accounts[currentEmail].categories=categories;
+  accounts[currentEmail].items=items;
+  return saveAccounts();
+}
+function readLegacyArchive(){
+  try{const raw=localStorage.getItem(LEGACY_KEY);if(!raw)return {categories:[],items:[]};const data=JSON.parse(raw);return {categories:Array.isArray(data.categories)?data.categories:[],items:Array.isArray(data.items)?data.items:[]}}
+  catch(e){return {categories:[],items:[]}}
+}
+function randomSalt(){const bytes=new Uint8Array(16);if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(bytes);else for(let i=0;i<bytes.length;i++)bytes[i]=Math.floor(Math.random()*256);return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('')}
+function fallbackHash(value){let h=0x811c9dc5;for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,0x01000193)}return (h>>>0).toString(16).padStart(8,'0')}
+async function passwordDigest(password,salt,algorithm){
+  if(algorithm==='PBKDF2-SHA256'){
+    if(!window.crypto?.subtle)throw new Error('보안 암호 확인 기능을 사용할 수 없어요. GitHub Pages 주소(https)를 통해 열어 주세요.');
+    const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);
+    const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:120000,hash:'SHA-256'},key,256);
+    return Array.from(new Uint8Array(bits),b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  return fallbackHash(salt+'|'+password);
+}
+async function makePasswordRecord(password){
+  const salt=randomSalt();const algorithm=window.crypto?.subtle?'PBKDF2-SHA256':'LOCAL-FALLBACK';
+  return {salt,algorithm,passwordHash:await passwordDigest(password,salt,algorithm)};
+}
+async function verifyPassword(record,password){
+  try{return await passwordDigest(password,record.salt,record.algorithm||'LOCAL-FALLBACK')===record.passwordHash}catch(e){throw e}
+}
+function updateAccountLabel(){$('accountEmailLabel').textContent=currentEmail||'로그인되지 않음'}
+function enterSpace(email){
+  currentEmail=email;const account=accounts[email];categories=normalizeCategories(account.categories||[]);items=normalizeItems(account.items||[]);
+  filter='all';query='';selectedId=null;editingId=null;$('searchInput').value='';updateAccountLabel();
+  $('loginWindow').classList.add('hidden');$('appWindow').classList.remove('hidden');$('taskApp').classList.add('active');
+  render();persist();setStatus('Ready · 준비');
+}
+function leaveSpace(){
+  persist();try{localStorage.removeItem(SESSION_KEY)}catch(e){}
+  currentEmail='';categories=[];items=[];filter='all';query='';selectedId=null;editingId=null;
+  $('appWindow').classList.add('hidden');$('taskApp').classList.remove('active');$('loginPassword').value='';$('loginPassword').type='password';$('togglePassword').setAttribute('aria-pressed','false');$('togglePassword').setAttribute('aria-label','비밀번호 보기');$('loginError').textContent='';$('loginWindow').classList.remove('hidden');$('loginEmail').value='';updateAccountLabel();setTimeout(()=>$('loginEmail').focus(),40);
+}
+async function handleLogin(event){
+  event.preventDefault();const email=$('loginEmail').value.trim().toLowerCase();const password=$('loginPassword').value;
+  $('loginError').textContent='';if(!email||!$('loginEmail').checkValidity()){ $('loginError').textContent='올바른 이메일 주소를 입력해 주세요.';return }
+  if(!password){$('loginError').textContent='비밀번호를 입력해 주세요.';return}
+  const submit=$('loginSubmit');submit.disabled=true;submit.textContent='Checking... 확인 중';
+  try{
+    let account=accounts[email];
+    if(account){
+      if(!await verifyPassword(account,password)){$('loginError').textContent='비밀번호가 일치하지 않아요.';return}
+    }else{
+      const legacy=Object.keys(accounts).length===0?readLegacyArchive():{categories:[],items:[]};
+      const passwordRecord=await makePasswordRecord(password);
+      account={...passwordRecord,categories:legacy.categories,items:legacy.items,created:new Date().toISOString()};
+      accounts[email]=account;if(!saveAccounts()){delete accounts[email];$('loginError').textContent='공간을 저장하지 못했어요. 브라우저 저장 공간을 확인해 주세요.';return}
+    }
+    localStorage.setItem(SESSION_KEY,email);enterSpace(email);
+  }catch(error){$('loginError').textContent=error?.message||'입장 중 문제가 생겼어요.'}
+  finally{submit.disabled=false;submit.innerHTML='Enter my space <small class="gloss">내 공간 입장</small>'}
+}
+function updateLoginHint(){const email=$('loginEmail').value.trim().toLowerCase();if(!email){$('loginHint').innerHTML='처음 사용하는 이메일이면 새 공간이 만들어져요.<br>같은 이메일과 비밀번호로 다시 로그인하면 저장한 자료가 열립니다.';return}if(accounts[email])$('loginHint').innerHTML='등록된 이메일이에요. 비밀번호를 입력하면 기존 공간으로 입장합니다.';else $('loginHint').innerHTML='새 이메일이에요. 입장하면 이 이메일 전용 공간이 만들어집니다.'}
+function setStatus(msg){$('statusMessage').textContent=msg}
+function toast(msg){setStatus(msg);clearTimeout(toast.timer);toast.timer=setTimeout(()=>setStatus('Ready · 준비'),2300)}
+function categoryName(id){return categories.find(c=>c.id===id)?.name||'Unsorted · 미분류'}
+function currentList(){return items.filter(x=>{const matchesFilter=filter==='all'||(filter==='favorite'&&x.favorite)||(filter==='uncategorized'&&!x.categoryId)||(filter.startsWith('cat:')&&x.categoryId===filter.slice(4));const matchesQuery=!query||(x.name+' '+x.text+' '+categoryName(x.categoryId)).toLowerCase().includes(query.toLowerCase());return matchesFilter&&matchesQuery}).sort((a,b)=>String(b.updated).localeCompare(String(a.updated)))}
+function updatePreview(){const selected=items.find(x=>x.id===selectedId)||null;$('previewLabel').innerHTML=selected?`${escapeHtml(selected.name)} <small class="gloss">${escapeHtml(categoryName(selected.categoryId))}</small>`:'No item selected <small class="gloss">선택된 항목 없음</small>';$('previewText').textContent=selected?selected.text:'카테고리를 만들고 텍스트를 추가해 보세요. ♡';$('editBtn').disabled=!selected;$('deleteBtn').disabled=!selected;$('favBtn').disabled=!selected;$('favBtn').querySelector('.toolglyph').textContent=selected?(selected.favorite?'♥':'♡'):'♡'}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderCategories(){const host=$('categoryNav');const sidebar=host.closest('.sidebar');const sidebarScroll=sidebar?sidebar.scrollTop:0;host.replaceChildren();categories.forEach(cat=>{const count=items.filter(x=>x.categoryId===cat.id).length;const b=document.createElement('button');b.className='navbtn'+(filter==='cat:'+cat.id?' active':'');b.dataset.filter='cat:'+cat.id;const icon=document.createElement('span');icon.className='navico';icon.textContent='▧';const name=document.createElement('span');name.className='navname';name.textContent=cat.name;const n=document.createElement('span');n.className='navcount';n.textContent=count;b.append(icon,name,n);host.append(b)});$('allCount').textContent=items.length;$('favCount').textContent=items.filter(x=>x.favorite).length;$('uncatCount').textContent=items.filter(x=>!x.categoryId).length;$('sideCount').textContent=items.length+' items · '+categories.length+' categories';document.querySelectorAll('.sidebar > .navbtn[data-filter]').forEach(b=>b.classList.toggle('active',filter===b.dataset.filter));$('categoryNav').querySelectorAll('button').forEach(b=>b.classList.toggle('active',filter===b.dataset.filter));if(sidebar)sidebar.scrollTop=sidebarScroll}
+function renderList(resetScroll=false){
+ const host=$('entryList');const oldScroll=host.scrollTop;const list=currentList();host.replaceChildren();
+ $('statusCount').textContent=list.length+' objects';
+ $('pathName').textContent=filter==='all'?'All items':filter==='favorite'?'Favorites':filter==='uncategorized'?'Unsorted':(categories.find(c=>('cat:'+c.id)===filter)?.name||'Category');
+ $('resultHint').textContent=list.length+'개 항목 · '+(filter==='all'?'전체 보관함':filter==='favorite'?'즐겨찾기':filter==='uncategorized'?'미분류':categoryName(filter.slice(4)));
+ if(!list.some(x=>x.id===selectedId))selectedId=list.length?list[0].id:null;
+ if(!list.length){const empty=document.createElement('div');empty.className='empty-state';empty.innerHTML='<div class="big">♡</div>아직 저장된 항목이 없어요.<br>New(새 항목)로 직접 추가해 보세요.';host.append(empty)}
+ list.forEach(item=>{
+  const row=document.createElement('div');row.className='entry'+(item.id===selectedId?' selected':'');row.setAttribute('role','listitem');row.dataset.id=item.id;
+  const main=document.createElement('button');main.type='button';main.className='entry-main entry-select';main.setAttribute('aria-label','항목 선택: '+item.name);
+  const ico=document.createElement('span');ico.className='entry-fileicon';ico.textContent=item.favorite?'♥':'▤';
+  const copy=document.createElement('span');copy.className='entry-copy';
+  const name=document.createElement('span');name.className='entry-name';name.textContent=item.text.replace(/\s+/g,' ').trim();name.title=item.text;copy.append(name);main.append(ico,copy);
+  main.addEventListener('mousedown',e=>{if(e.button===0)e.preventDefault()});main.addEventListener('click',()=>selectItem(item.id));
+  const copyButton=document.createElement('button');copyButton.type='button';copyButton.className='entry-copy-btn';copyButton.innerHTML='Copy <small class="gloss">복사</small>';copyButton.title='이 항목의 내용 복사';copyButton.setAttribute('aria-label','복사: '+item.name);copyButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();copyText(item.text)});
+  const date=document.createElement('span');date.className='entry-date';date.textContent=formatDate(item.updated);
+  row.append(main,copyButton,date);host.append(row);
+ });
+ host.scrollTop=resetScroll?0:oldScroll;updatePreview();renderCategories()
+}
+function render(){renderList(true)}
+function selectItem(id){selectedId=id;$('entryList').querySelectorAll('.entry').forEach(row=>{const active=row.dataset.id===id;row.classList.toggle('selected',active);row.setAttribute('aria-selected',active?'true':'false')});updatePreview()}
+function formatDate(value){const d=new Date(value);if(Number.isNaN(d.getTime()))return '—';return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`}
+async function copyText(text){
+ // Clipboard API on secure origins; local file:// pages use the synchronous fallback first.
+ if(window.isSecureContext&&navigator.clipboard&&navigator.clipboard.writeText){
+  try{await navigator.clipboard.writeText(text);toast('Copied · 복사 완료 ♡');return}catch(e){}
+ }
+ let ok=false;const area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='0';area.style.top='0';area.style.width='2px';area.style.height='2px';area.style.opacity='0.01';area.style.fontSize='16px';document.body.append(area);area.focus();area.select();area.setSelectionRange(0,area.value.length);try{ok=document.execCommand('copy')}catch(e){ok=false}area.remove();
+ if(ok){toast('Copied · 복사 완료 ♡');return}
+ $('manualCopyText').value=text;$('manualCopyScrim').classList.add('open');setTimeout(()=>{$('manualCopyText').focus();$('manualCopyText').select()},30);
+}
+function fillCategorySelect(current=''){$('itemCategory').replaceChildren();const unc=document.createElement('option');unc.value='';unc.textContent='Unsorted · 미분류';$('itemCategory').append(unc);categories.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;$('itemCategory').append(o)});$('itemCategory').value=categories.some(c=>c.id===current)?current:''}
+function openItemDialog(item=null){editingId=item?item.id:null;$('itemDialogTitle').innerHTML=item?'Edit item <small class="gloss">항목 수정</small>':'New item <small class="gloss">새 항목</small>';$('itemText').value=item?.text||'';const defaultCategory= item?.categoryId || (filter.startsWith('cat:')?filter.slice(4):'');fillCategorySelect(defaultCategory);$('itemScrim').classList.add('open');setTimeout(()=>$('itemText').focus(),30)}
+function closeItemDialog(){$('itemScrim').classList.remove('open');editingId=null}
+function saveItem(){const text=$('itemText').value;const name=itemNameFromText(text);const categoryId=$('itemCategory').value;if(!text.trim()){$('itemText').focus();toast('텍스트를 입력해 주세요.');return}const now=new Date().toISOString();if(editingId){const old=items.find(x=>x.id===editingId);if(old){old.name=name;old.text=text;old.categoryId=categoryId;old.updated=now}}else{const item={id:makeId('item'),name,text,categoryId,favorite:false,created:now,updated:now};items.unshift(item);selectedId=item.id}persist();const id=editingId;closeItemDialog();if(selectedId){filter='all';if(items.find(x=>x.id===selectedId)?.categoryId)filter='cat:'+items.find(x=>x.id===selectedId).categoryId}render();if(!id&&selectedId){const row=$('entryList').querySelector(`[data-id="${CSS.escape(selectedId)}"]`);row?.scrollIntoView({block:'nearest'})}toast(id?'Saved changes · 수정 완료':'Item saved · 항목 저장 완료')}
+function openCategoryDialog(){$('categoryScrim').classList.add('open');renderCategoryManager();setTimeout(()=>$('newCategoryName').focus(),30)}
+function closeCategoryDialog(){$('categoryScrim').classList.remove('open')}
+function renderCategoryManager(){const host=$('categoryList');host.replaceChildren();if(!categories.length){const p=document.createElement('div');p.className='dialog-note';p.textContent='아직 만든 카테고리가 없습니다.';host.append(p)}categories.forEach(cat=>{const row=document.createElement('div');row.className='category-row';const label=document.createElement('span');label.className='cat-label';label.textContent=cat.name;const rename=document.createElement('button');rename.type='button';rename.textContent='✎';rename.title='Rename · 이름 변경';rename.setAttribute('aria-label','Rename category · 카테고리 이름 변경');rename.addEventListener('click',()=>{const name=window.prompt('새 카테고리 이름을 입력하세요.',cat.name);if(name===null)return;const clean=name.trim().slice(0,28);if(!clean)return;if(categories.some(c=>c.id!==cat.id&&c.name.toLowerCase()===clean.toLowerCase())){alert('같은 이름의 카테고리가 이미 있어요.');return}cat.name=clean;persist();renderCategoryManager();render();toast('Category renamed · 이름 변경 완료')});const del=document.createElement('button');del.type='button';del.textContent='×';del.title='Delete · 삭제';del.setAttribute('aria-label','Delete category · 카테고리 삭제');del.addEventListener('click',()=>{if(!confirm(`'${cat.name}' 카테고리를 삭제할까요? 안의 항목은 미분류로 이동합니다.`))return;items.forEach(x=>{if(x.categoryId===cat.id){x.categoryId='';x.updated=new Date().toISOString()}});categories=categories.filter(c=>c.id!==cat.id);if(filter==='cat:'+cat.id)filter='all';persist();renderCategoryManager();render();toast('Category deleted · 분류 삭제 완료')});row.append(label,rename,del);host.append(row)})}
+function addCategory(){const input=$('newCategoryName');const name=input.value.trim().slice(0,28);if(!name){input.focus();return}if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){toast('이미 있는 카테고리예요.');return}categories.push({id:makeId('cat'),name});input.value='';persist();renderCategoryManager();renderCategories();fillCategorySelect($('itemCategory').value);toast('Category added · 분류 추가 완료')}
+function exportBackup(){const payload={app:'cotton.zip',version:3,exportedAt:new Date().toISOString(),categories,items};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cotton-zip-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);toast('Backup created · 백업 파일 생성 완료')}
+function importBackup(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(String(reader.result));const importedCategories=Array.isArray(data)?[]:normalizeCategories(Array.isArray(data.categories)?data.categories:[]);const rawItems=Array.isArray(data)?data:(data.items);if(!Array.isArray(rawItems))throw new Error('invalid');const oldCategories=categories;categories=importedCategories;const clean=normalizeItems(rawItems);if(rawItems.length&&clean.length===0)throw new Error('invalid');if(!confirm('현재 보관함을 백업 파일의 내용으로 교체할까요?\nReplace current archive? · 현재 자료가 파일 내용으로 바뀝니다.')){categories=oldCategories;return}items=clean;filter='all';selectedId=null;query='';$('searchInput').value='';persist();render();toast('Backup loaded · 백업 불러오기 완료')}catch(e){alert('이 파일을 백업으로 읽을 수 없어요. cotton.zip JSON 파일인지 확인해 주세요.')}};reader.readAsText(file)}
+function setFilter(value){filter=value;render()}
+function openWindow(){if(!currentEmail){$('loginWindow').classList.remove('hidden');return}$('appWindow').classList.remove('hidden');document.body.dataset.minimized='false';$('taskApp').classList.add('active');$('startMenu').classList.remove('open')}
+// Email-based local spaces and remembered sign-in.
+$('loginForm').addEventListener('submit',handleLogin);
+$('loginEmail').addEventListener('input',updateLoginHint);
+$('togglePassword').addEventListener('click',()=>{const input=$('loginPassword');const showing=input.type==='password';input.type=showing?'text':'password';$('togglePassword').setAttribute('aria-pressed',showing?'true':'false');$('togglePassword').setAttribute('aria-label',showing?'비밀번호 숨기기':'비밀번호 보기');$('togglePassword').innerHTML=showing?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0112 5c6.2 0 9.5 7 9.5 7a15 15 0 01-3.1 3.8M6.2 6.3C3.8 7.8 2.5 12 2.5 12s3.3 7 9.5 7c1.3 0 2.5-.3 3.5-.8"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg>';});
+$('logoutBtn').addEventListener('click',leaveSpace);
+
+// Navigation and actions
+document.querySelectorAll('.navbtn[data-filter]').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
+$('categoryNav').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(b)setFilter(b.dataset.filter)});
+$('searchInput').addEventListener('input',e=>{query=e.target.value;renderList(true)});
+$('newBtn').addEventListener('click',()=>openItemDialog());$('saveItem').addEventListener('click',saveItem);$('cancelItem').addEventListener('click',closeItemDialog);
+$('itemScrim').addEventListener('click',e=>{if(e.target===$('itemScrim'))closeItemDialog()});$('closeManualCopy').addEventListener('click',()=>$('manualCopyScrim').classList.remove('open'));$('selectCopyText').addEventListener('click',()=>{$('manualCopyText').focus();$('manualCopyText').select()});$('manualCopyScrim').addEventListener('click',e=>{if(e.target===$('manualCopyScrim'))$('manualCopyScrim').classList.remove('open')});
+$('editBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x)});
+$('deleteBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;if(!confirm(`'${x.name}' 항목을 삭제할까요?`))return;items=items.filter(y=>y.id!==x.id);selectedId=null;persist();renderList(false);toast('Item deleted · 항목 삭제 완료')});
+$('favBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;x.favorite=!x.favorite;x.updated=new Date().toISOString();persist();renderList(false);toast(x.favorite?'Added to favorites · 즐겨찾기 추가':'Removed from favorites · 즐겨찾기 해제')});
+$('backupBtn').addEventListener('click',exportBackup);$('startBackup').addEventListener('click',exportBackup);
+$('importBtn').addEventListener('click',()=>$('fileInput').click());$('fileInput').addEventListener('change',e=>{importBackup(e.target.files[0]);e.target.value=''});
+$('categoryBtn').addEventListener('click',openCategoryDialog);$('manageCategoryInline').addEventListener('click',openCategoryDialog);$('sideAddCategory').addEventListener('click',openCategoryDialog);$('closeCategories').addEventListener('click',closeCategoryDialog);$('addCategory').addEventListener('click',addCategory);$('newCategoryName').addEventListener('keydown',e=>{if(e.key==='Enter')addCategory()});$('quickAddCategory').addEventListener('click',()=>{openCategoryDialog()});
+$('desktopArchive').addEventListener('click',openWindow);$('desktopComputer').addEventListener('click',()=>alert('내 컴퓨터\n\n각 이메일의 공간 데이터는 이 브라우저에 분리 저장됩니다. JSON 백업 파일을 별도로 보관해 주세요.'));
+$('taskApp').addEventListener('click',()=>{if(!currentEmail){$('loginWindow').classList.remove('hidden');return}if($('appWindow').classList.contains('hidden'))openWindow();else $('appWindow').classList.toggle('hidden')});
+$('minBtn').addEventListener('click',()=>{$('appWindow').classList.add('hidden');$('taskApp').classList.remove('active')});$('closeBtn').addEventListener('click',()=>{$('appWindow').classList.add('hidden');$('taskApp').classList.remove('active')});$('maxBtn').addEventListener('click',()=>$('appWindow').classList.toggle('maximized'));
+$('startBtn').addEventListener('click',()=>$('startMenu').classList.toggle('open'));$('startOpen').addEventListener('click',openWindow);$('startHelp').addEventListener('click',()=>{ $('startMenu').classList.remove('open');alert('cotton.zip · little text archive\n\n이메일별로 분리된 로컬 텍스트 보관함입니다. 공간 안에서 카테고리를 만들고 자동 저장과 JSON 백업/복원을 할 수 있습니다.')});
+$('fileMenu').addEventListener('click',()=>{if(confirm('JSON 백업 파일을 만들까요?'))exportBackup()});$('editMenu').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x);else openItemDialog()});$('viewMenu').addEventListener('click',()=>{filter='all';$('searchInput').value='';query='';render();toast('All items · 전체 항목')});$('helpMenu').addEventListener('click',()=>$('startHelp').click());
+document.addEventListener('click',e=>{if(!$('startMenu').contains(e.target)&&e.target!==$('startBtn'))$('startMenu').classList.remove('open')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeItemDialog();closeCategoryDialog();$('manualCopyScrim').classList.remove('open');$('startMenu').classList.remove('open')}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='n'){e.preventDefault();openItemDialog()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();exportBackup()}});
+// Draggable classic desktop window. Pointer capture is limited to the title bar.
+const win=$('appWindow'),bar=$('titlebar');let drag=null;
+bar.addEventListener('pointerdown',e=>{if(e.target.closest('button')||win.classList.contains('maximized')||window.innerWidth<=700)return;const r=win.getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};bar.setPointerCapture(e.pointerId)});
+bar.addEventListener('pointermove',e=>{if(!drag)return;const x=Math.max(0,Math.min(window.innerWidth-win.offsetWidth,e.clientX-drag.x));const y=Math.max(0,Math.min(window.innerHeight-80,e.clientY-drag.y));win.style.left=x+'px';win.style.top=y+'px';win.style.transform='none'});
+bar.addEventListener('pointerup',()=>drag=null);bar.addEventListener('pointercancel',()=>drag=null);
+function updateClock(){const d=new Date();$('clock').textContent=d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false})}updateClock();setInterval(updateClock,30000);
+safeLoad();updateAccountLabel();
+setTimeout(()=>{const boot=$('bootScreen');if(boot){boot.classList.add('finished');setTimeout(()=>boot.remove(),300)}},720);
+const rememberedEmail=(()=>{try{return localStorage.getItem(SESSION_KEY)||''}catch(e){return ''}})();
+if(rememberedEmail&&accounts[rememberedEmail]){enterSpace(rememberedEmail)}else{$('loginWindow').classList.remove('hidden');$('appWindow').classList.add('hidden');setTimeout(()=>$('loginEmail').focus(),80)}
+})();
+</script>
+<script>if("serviceWorker" in navigator && location.protocol !== "file:"){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script>
+</body>
+</html>
