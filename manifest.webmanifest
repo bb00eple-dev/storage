@@ -1,15 +1,16 @@
 {
-  "name": "cotton.zip - Text Archive",
+  "name": "cotton.zip Text Archive",
   "short_name": "cotton.zip",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#fffefa",
-  "theme_color": "#fffefa",
+  "background_color": "#fffaf2",
+  "theme_color": "#fffaf2",
   "icons": [
     {
       "src": "./icon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
