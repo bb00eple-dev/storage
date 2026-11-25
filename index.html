@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="cotton-build" content="backup-import-ui-v7-visible-import-20261125">
+<meta name="cotton-build" content="hierarchical-categories-batch-move-v8-20261125">
 <meta name="theme-color" content="#fffefa">
-<title>cotton.zip - text archive</title>
+<title>cotton.zip - text archive v8</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
@@ -393,6 +393,52 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
   #appWindow .preview-actions button{min-width:62px;min-height:23px;font-size:10px}
 }
 
+
+/* v8 hierarchy + batch tools */
+#appWindow .list-head,#appWindow .entry{grid-template-columns:25px minmax(0,1fr) 112px 58px;}
+#appWindow .list-head{min-height:38px}
+#appWindow .entry{min-height:48px}
+.row-check,.head-check{width:14px;height:14px;accent-color:#b99ba1;justify-self:center;cursor:pointer}
+.entry-main{display:flex;flex-direction:row;align-items:center;gap:7px}
+.entry-copy{min-width:0;display:flex;flex-direction:column;gap:3px;flex:1}
+.entry-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.entry-category{display:block;color:#9a9287;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-copy-btn{width:92px}
+#appWindow .content-toolbar{gap:6px}
+.bulk-tools{display:flex;align-items:center;gap:5px;flex:0 0 auto;min-width:0}
+.bulk-count{font-size:9px;color:#8a8177;white-space:nowrap}
+.bulk-tools .mini-btn{max-width:none!important}
+.navbtn.subcategory-nav{padding-left:22px;min-height:25px;font-size:10px;color:#777168}
+.navbtn.subcategory-nav .navico{font-size:10px;color:#b3a3a0}
+.navbtn.parent-nav .navname{font-weight:bold}
+.category-indent{border-left:1px dotted #e4ded4;margin-left:12px;padding-left:3px}
+.field .subcat-note{font-size:9px;color:#999187;line-height:1.4}
+.batch-textarea{min-height:190px!important;line-height:1.55;white-space:pre;tab-size:2}
+.category-row.sub-row{margin-left:18px;background:#fffafb;border-style:dotted}
+.category-row .cat-kind{font-size:9px;color:#a49b90;white-space:nowrap}
+.bulk-preview{font-size:10px;color:#81796f;background:#fffefa;border:1px dotted #e2ddd3;padding:6px 8px;line-height:1.5;white-space:pre-wrap}
+@media(max-width:700px){
+ #appWindow .list-head,#appWindow .entry{grid-template-columns:22px minmax(0,1fr) 74px 46px;gap:3px;padding-left:4px;padding-right:4px}
+ #appWindow .list-head{font-size:9px}
+ #appWindow .entry-copy-btn{width:68px;height:26px;font-size:10px}
+ #appWindow .entry-copy-btn .gloss{font-size:7px}
+ #appWindow .content-toolbar{flex-wrap:wrap;min-height:42px;overflow:visible}
+ #appWindow .content-toolbar .hint{flex:1 1 100%;}
+ #appWindow .content-toolbar .mini-btn{max-width:100%!important}
+ #appWindow .bulk-tools{order:2;flex:1 1 auto}
+ #appWindow #manageCategoryInline{order:3}
+ .navbtn.subcategory-nav{padding-left:12px}
+}
+@media(max-width:420px){
+ #appWindow .list-head,#appWindow .entry{grid-template-columns:20px minmax(0,1fr) 62px 42px;gap:2px}
+ #appWindow .entry-date{font-size:8px}
+ #appWindow .entry-category{font-size:8px}
+ #appWindow .entry-copy-btn{width:58px;padding:2px}
+ .bulk-tools{gap:3px}
+ .bulk-tools .mini-btn{padding:3px 5px;font-size:9px}
+ .bulk-count{font-size:8px}
+}
+
 </style>
 </head>
 <body>
@@ -454,6 +500,7 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
     </div>
     <div class="toolbar">
       <button class="toolbtn" id="newBtn" title="새 텍스트 추가"><span class="toolglyph">＋</span><span class="tool-label">New<small class="gloss">새 항목</small></span></button>
+      <button class="toolbtn" id="batchBtn" title="여러 항목 한 번에 등록"><span class="toolglyph">▤</span><span class="tool-label">Batch<small class="gloss">한 번에 등록</small></span></button>
       <button class="toolbtn" id="categoryBtn" title="카테고리 관리"><span class="toolglyph">▦</span><span class="tool-label">Category<small class="gloss">분류</small></span></button>
       <button class="toolbtn" id="favBtn" title="즐겨찾기 설정"><span class="toolglyph">♡</span><span class="tool-label">Favorite<small class="gloss">즐겨찾기</small></span></button>
       <span class="tool-sep"></span>
@@ -477,8 +524,8 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
       </aside>
       <main class="content-panel">
         <div class="pathbar"><span>▣</span><strong>My Archive</strong><span>›</span><span id="pathName">All items</span></div>
-        <div class="content-toolbar"><span class="hint" id="resultHint">아직 저장된 텍스트가 없습니다.</span><button class="mini-btn" id="manageCategoryInline">Manage categories <small class="gloss">분류 관리</small></button></div>
-        <div class="list-head"><span>Name <small class="gloss">이름</small></span><span class="list-head-category"><span>Category</span><small class="gloss">분류</small></span><span>Updated <small class="gloss">날짜</small></span></div>
+        <div class="content-toolbar"><span class="hint" id="resultHint">아직 저장된 텍스트가 없습니다.</span><div class="bulk-tools"><span class="bulk-count" id="bulkCount">선택 0개</span><button class="mini-btn" id="moveSelectedBtn" disabled>Move <small class="gloss">선택 이동</small></button><button class="mini-btn" id="clearSelectionBtn" disabled>Clear <small class="gloss">해제</small></button></div><button class="mini-btn" id="manageCategoryInline">Manage categories <small class="gloss">분류 관리</small></button></div>
+        <div class="list-head"><input class="head-check" id="selectVisibleItems" type="checkbox" aria-label="현재 목록 전체 선택"><span>Name <small class="gloss">이름 · 분류</small></span><span class="list-head-category"><span>Quick copy</span><small class="gloss">빠른 복사</small></span><span>Updated <small class="gloss">날짜</small></span></div>
         <div class="entries" id="entryList" role="list" aria-label="저장된 텍스트 목록"></div>
         <div class="preview">
           <div class="preview-content"><div class="preview-label" id="previewLabel">No item selected <small class="gloss">선택된 항목 없음</small></div><div class="preview-text" id="previewText">카테고리를 만들고 텍스트를 추가해 보세요. ♡</div></div>
@@ -521,7 +568,8 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
       <div class="dialog-title" id="itemDialogTitle">New item <small class="gloss">새 항목</small></div>
       <div class="dialog-body">
         <div class="field"><label for="itemText">Content <small class="gloss">내용 · 이름</small></label><textarea id="itemText" maxlength="1500" placeholder="보관할 카오모지, 구분선 또는 문구를 입력하세요."></textarea></div>
-        <div class="field"><label for="itemCategory">Category <small class="gloss">카테고리</small></label><div class="inline-add"><select id="itemCategory" style="flex:1"><option value="">Unsorted · 미분류</option></select><button id="quickAddCategory" type="button">＋</button></div></div>
+        <div class="field"><label for="itemCategory">Main category <small class="gloss">대분류</small></label><div class="inline-add"><select id="itemCategory" style="flex:1"><option value="">Unsorted · 미분류</option></select><button id="quickAddCategory" type="button">＋</button></div></div>
+        <div class="field"><label for="itemSubcategory">Subcategory <small class="gloss">소분류</small></label><select id="itemSubcategory"><option value="">소분류 없음</option></select><span class="subcat-note">대분류를 먼저 선택하면 해당 소분류가 표시돼요.</span></div>
         <div class="dialog-note">입력한 내용이 항목 이름으로 표시됩니다. 이 내용은 현재 이메일 공간에 자동 저장돼요.</div>
       </div>
       <div class="dialog-actions"><button id="cancelItem">Cancel <small class="gloss">취소</small></button><button class="primary" id="saveItem">Save <small class="gloss">저장</small></button></div>
@@ -532,9 +580,10 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
     <div class="dialog">
       <div class="dialog-title" id="categoryDialogTitle">Category settings <small class="gloss">카테고리 설정</small></div>
       <div class="dialog-body">
-        <div class="field"><label>My categories <small class="gloss">내 카테고리</small></label><div class="category-list" id="categoryList"></div></div>
-        <div class="field"><label for="newCategoryName">Add category <small class="gloss">분류 추가</small></label><div class="inline-add"><input id="newCategoryName" maxlength="28" placeholder="새 카테고리 이름"><button id="addCategory">Add <small class="gloss">추가</small></button></div></div>
-        <div class="dialog-note">카테고리를 삭제해도 그 안의 텍스트는 삭제되지 않고 '미분류'로 이동합니다.</div>
+        <div class="field"><label>My categories <small class="gloss">대분류와 소분류</small></label><div class="category-list" id="categoryList"></div></div>
+        <div class="field"><label for="newCategoryName">Add main category <small class="gloss">대분류 추가</small></label><div class="inline-add"><input id="newCategoryName" maxlength="28" placeholder="예: 카오모지"><button id="addCategory">Add <small class="gloss">추가</small></button></div></div>
+        <div class="field"><label for="newSubParent">Add subcategory <small class="gloss">소분류 추가</small></label><div class="inline-add"><select id="newSubParent" style="flex:1"><option value="">대분류 선택</option></select><input id="newSubcategoryName" maxlength="28" placeholder="예: 웃음" style="flex:1"><button id="addSubcategory">＋</button></div></div>
+        <div class="dialog-note">대분류를 삭제하면 하위 소분류와 연결된 항목은 미분류로 이동해요. 소분류만 삭제하면 해당 항목은 같은 대분류에 남습니다.</div>
       </div>
       <div class="dialog-actions"><button id="closeCategories">Close <small class="gloss">닫기</small></button></div>
     </div>
@@ -545,6 +594,34 @@ html,body{width:100%;min-width:0;min-height:0;overflow:hidden}
       <div class="dialog-title" id="manualCopyTitle">Copy text <small class="gloss">텍스트 복사</small></div>
       <div class="dialog-body"><div class="dialog-note">브라우저가 자동 복사를 허용하지 않아 텍스트를 선택해 두었어요. Ctrl+C 또는 길게 눌러 복사해 주세요.</div><div class="field"><textarea id="manualCopyText" readonly aria-label="복사할 텍스트"></textarea></div></div>
       <div class="dialog-actions"><button id="selectCopyText">Select all <small class="gloss">전체 선택</small></button><button class="primary" id="closeManualCopy">Close <small class="gloss">닫기</small></button></div>
+    </div>
+  </div>
+
+
+  <div class="scrim" id="batchScrim" role="dialog" aria-modal="true" aria-labelledby="batchDialogTitle">
+    <div class="dialog">
+      <div class="dialog-title" id="batchDialogTitle">Batch add <small class="gloss">여러 항목 한 번에 등록</small></div>
+      <div class="dialog-body">
+        <div class="field"><label for="batchText">Contents <small class="gloss">항목 내용</small></label><textarea class="batch-textarea" id="batchText" maxlength="30000" placeholder="한 줄에 항목 하나씩 입력해 주세요.
+(예: (๑˃̵ᴗ˂̵)و
+      ૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა
+      (｡•̀ᴗ-)✧)"></textarea><span class="subcat-note">줄바꿈 기준으로 나뉘며, 빈 줄은 건너뜁니다. 한 번에 최대 200개까지 등록할 수 있어요.</span><div class="bulk-preview" id="batchPreview">등록할 항목 0개</div></div>
+        <div class="field"><label for="batchCategory">Main category <small class="gloss">대분류</small></label><select id="batchCategory"><option value="">Unsorted · 미분류</option></select></div>
+        <div class="field"><label for="batchSubcategory">Subcategory <small class="gloss">소분류</small></label><select id="batchSubcategory"><option value="">소분류 없음</option></select></div>
+      </div>
+      <div class="dialog-actions"><button id="cancelBatch">Cancel <small class="gloss">취소</small></button><button class="primary" id="saveBatch">Add items <small class="gloss">한꺼번에 등록</small></button></div>
+    </div>
+  </div>
+
+  <div class="scrim" id="moveScrim" role="dialog" aria-modal="true" aria-labelledby="moveDialogTitle">
+    <div class="dialog">
+      <div class="dialog-title" id="moveDialogTitle">Move selected <small class="gloss">선택 항목 한꺼번에 이동</small></div>
+      <div class="dialog-body">
+        <div class="dialog-note" id="moveSummary">선택한 항목의 새 위치를 지정해 주세요.</div>
+        <div class="field"><label for="moveCategory">Destination main category <small class="gloss">이동할 대분류</small></label><select id="moveCategory"><option value="">Unsorted · 미분류</option></select></div>
+        <div class="field"><label for="moveSubcategory">Destination subcategory <small class="gloss">이동할 소분류</small></label><select id="moveSubcategory"><option value="">소분류 없음</option></select></div>
+      </div>
+      <div class="dialog-actions"><button id="cancelMove">Cancel <small class="gloss">취소</small></button><button class="primary" id="applyMove">Move items <small class="gloss">이동하기</small></button></div>
     </div>
   </div>
 
@@ -571,15 +648,30 @@ const SPACES_KEY='cotton_zip_email_spaces_v1';
 const SESSION_KEY='cotton_zip_remembered_email_v1';
 const LEGACY_KEY='cotton_zip_archive_v3';
 let accounts={},currentEmail='',categories=[],items=[],filter='all',query='',selectedId=null,editingId=null;
+const bulkSelectedIds=new Set();
 function safeLoad(){
   try{const raw=localStorage.getItem(SPACES_KEY);if(raw){const data=JSON.parse(raw);if(data&&data.accounts&&typeof data.accounts==='object')accounts=data.accounts}}
   catch(e){console.warn('Could not load email spaces',e)}
 }
 function saveAccounts(){try{localStorage.setItem(SPACES_KEY,JSON.stringify({app:'cotton.zip',version:1,accounts}));return true}catch(e){setStatus('저장 공간을 확인해 주세요.');return false}}
 function makeId(prefix){return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
-function normalizeCategories(arr){const seen=new Set();return arr.filter(x=>x&&typeof x.name==='string').map(x=>({id:String(x.id||makeId('cat')),name:x.name.trim().slice(0,28)})).filter(x=>x.name&&!seen.has(x.name.toLowerCase())&&seen.add(x.name.toLowerCase()))}
+function normalizeCategories(arr){
+  const seen=new Set();
+  return (Array.isArray(arr)?arr:[]).map(raw=>{
+    const x=typeof raw==='string'?{name:raw}:raw;if(!x||typeof x.name!=='string')return null;
+    const name=x.name.trim().slice(0,28);if(!name||seen.has(name.toLowerCase()))return null;seen.add(name.toLowerCase());
+    const subSeen=new Set();const rawSubs=Array.isArray(x.subcategories)?x.subcategories:(Array.isArray(x.children)?x.children:[]);
+    const subcategories=rawSubs.map(rawSub=>{const sub=typeof rawSub==='string'?{name:rawSub}:rawSub;if(!sub||typeof sub.name!=='string')return null;const subName=sub.name.trim().slice(0,28);if(!subName||subSeen.has(subName.toLowerCase()))return null;subSeen.add(subName.toLowerCase());return {id:String(sub.id||makeId('sub')),name:subName}}).filter(Boolean);
+    return {id:String(x.id||makeId('cat')),name,subcategories};
+  }).filter(Boolean);
+}
+function findSubcategory(subId,parentId=''){for(const cat of categories){if(parentId&&cat.id!==parentId)continue;const sub=(cat.subcategories||[]).find(x=>x.id===subId);if(sub)return {category:cat,subcategory:sub}}return null}
+function subcategoryName(subId){return findSubcategory(subId)?.subcategory.name||''}
+function categoryPath(categoryId,subcategoryId=''){const main=categories.find(c=>c.id===categoryId);if(!main)return '미분류';const sub=(main.subcategories||[]).find(x=>x.id===subcategoryId);return sub?main.name+' › '+sub.name:main.name}
+function validSubcategoryId(categoryId,subcategoryId){return categoryId&&findSubcategory(subcategoryId,categoryId)?subcategoryId:''}
+
 function itemNameFromText(value){const text=String(value||'').trim();const firstLine=text.split(/\r?\n/).map(line=>line.trim()).find(Boolean)||'이름 없는 항목';return firstLine.replace(/\s+/g,' ').slice(0,48)}
-function normalizeItems(arr){return arr.filter(x=>x&&typeof x.text==='string').map((x,i)=>({id:String(x.id||('item-'+i)),name:itemNameFromText(x.text),categoryId:categories.some(c=>c.id===x.categoryId)?x.categoryId:'',text:x.text.slice(0,1500),favorite:!!x.favorite,created:x.created||new Date().toISOString(),updated:x.updated||x.created||new Date().toISOString()}))}
+function normalizeItems(arr){return (Array.isArray(arr)?arr:[]).filter(x=>x&&typeof x.text==='string').map((x,i)=>{const categoryId=categories.some(c=>c.id===x.categoryId)?x.categoryId:'';let subcategoryId=validSubcategoryId(categoryId,x.subcategoryId||'');if(!subcategoryId&&categoryId&&typeof x.subcategory==='string'){const found=categories.find(c=>c.id===categoryId)?.subcategories.find(v=>v.name.toLowerCase()===x.subcategory.trim().toLowerCase());subcategoryId=found?.id||''}return {id:String(x.id||('item-'+i)),name:itemNameFromText(x.text),categoryId,subcategoryId,text:x.text.slice(0,1500),favorite:!!x.favorite,created:x.created||new Date().toISOString(),updated:x.updated||x.created||new Date().toISOString()}})}
 function persist(){
   if(!currentEmail||!accounts[currentEmail])return false;
   accounts[currentEmail].categories=categories;
@@ -611,13 +703,13 @@ async function verifyPassword(record,password){
 function updateAccountLabel(){$('accountEmailLabel').textContent=currentEmail||'로그인되지 않음'}
 function enterSpace(email){
   currentEmail=email;const account=accounts[email];categories=normalizeCategories(account.categories||[]);items=normalizeItems(account.items||[]);
-  filter='all';query='';selectedId=null;editingId=null;$('searchInput').value='';updateAccountLabel();
+  filter='all';query='';selectedId=null;editingId=null;bulkSelectedIds.clear();$('searchInput').value='';updateAccountLabel();
   $('loginWindow').classList.add('hidden');$('appWindow').classList.remove('hidden');$('taskApp').classList.add('active');
   render();persist();setStatus('Ready · 준비');
 }
 function leaveSpace(){
   persist();try{localStorage.removeItem(SESSION_KEY)}catch(e){}
-  currentEmail='';categories=[];items=[];filter='all';query='';selectedId=null;editingId=null;
+  currentEmail='';categories=[];items=[];filter='all';query='';selectedId=null;editingId=null;bulkSelectedIds.clear();
   $('appWindow').classList.add('hidden');$('taskApp').classList.remove('active');$('loginPassword').value='';$('loginPassword').type='password';$('togglePassword').setAttribute('aria-pressed','false');$('togglePassword').setAttribute('aria-label','비밀번호 보기');$('loginError').textContent='';$('loginWindow').classList.remove('hidden');$('loginEmail').value='';updateAccountLabel();setTimeout(()=>$('loginEmail').focus(),40);
 }
 async function handleLogin(event){
@@ -643,29 +735,39 @@ function updateLoginHint(){const email=$('loginEmail').value.trim().toLowerCase(
 function setStatus(msg){$('statusMessage').textContent=msg}
 function toast(msg){setStatus(msg);clearTimeout(toast.timer);toast.timer=setTimeout(()=>setStatus('Ready · 준비'),2300)}
 function categoryName(id){return categories.find(c=>c.id===id)?.name||'Unsorted · 미분류'}
-function currentList(){return items.filter(x=>{const matchesFilter=filter==='all'||(filter==='favorite'&&x.favorite)||(filter==='uncategorized'&&!x.categoryId)||(filter.startsWith('cat:')&&x.categoryId===filter.slice(4));const matchesQuery=!query||(x.name+' '+x.text+' '+categoryName(x.categoryId)).toLowerCase().includes(query.toLowerCase());return matchesFilter&&matchesQuery}).sort((a,b)=>String(b.updated).localeCompare(String(a.updated)))}
-function updatePreview(){const selected=items.find(x=>x.id===selectedId)||null;$('previewLabel').innerHTML=selected?`${escapeHtml(selected.name)} <small class="gloss">${escapeHtml(categoryName(selected.categoryId))}</small>`:'No item selected <small class="gloss">선택된 항목 없음</small>';$('previewText').textContent=selected?selected.text:'카테고리를 만들고 텍스트를 추가해 보세요. ♡';$('editBtn').disabled=!selected;$('deleteBtn').disabled=!selected;$('favBtn').disabled=!selected;$('favBtn').querySelector('.toolglyph').textContent=selected?(selected.favorite?'♥':'♡'):'♡'}
+function currentList(){return items.filter(x=>{const matchesFilter=filter==='all'||(filter==='favorite'&&x.favorite)||(filter==='uncategorized'&&!x.categoryId)||(filter.startsWith('cat:')&&x.categoryId===filter.slice(4))||(filter.startsWith('sub:')&&x.subcategoryId===filter.slice(4));const matchesQuery=!query||(x.name+' '+x.text+' '+categoryPath(x.categoryId,x.subcategoryId)).toLowerCase().includes(query.toLowerCase());return matchesFilter&&matchesQuery}).sort((a,b)=>String(b.updated).localeCompare(String(a.updated)))}
+function updatePreview(){const selected=items.find(x=>x.id===selectedId)||null;$('previewLabel').innerHTML=selected?`${escapeHtml(selected.name)} <small class="gloss">${escapeHtml(categoryPath(selected.categoryId,selected.subcategoryId))}</small>`:'No item selected <small class="gloss">선택된 항목 없음</small>';$('previewText').textContent=selected?selected.text:'카테고리를 만들고 텍스트를 추가해 보세요. ♡';$('editBtn').disabled=!selected;$('deleteBtn').disabled=!selected;$('favBtn').disabled=!selected;$('favBtn').querySelector('.toolglyph').textContent=selected?(selected.favorite?'♥':'♡'):'♡'}
 function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function renderCategories(){const host=$('categoryNav');const sidebar=host.closest('.sidebar');const sidebarScroll=sidebar?sidebar.scrollTop:0;host.replaceChildren();categories.forEach(cat=>{const count=items.filter(x=>x.categoryId===cat.id).length;const b=document.createElement('button');b.className='navbtn'+(filter==='cat:'+cat.id?' active':'');b.dataset.filter='cat:'+cat.id;const icon=document.createElement('span');icon.className='navico';icon.textContent='▧';const name=document.createElement('span');name.className='navname';name.textContent=cat.name;const n=document.createElement('span');n.className='navcount';n.textContent=count;b.append(icon,name,n);host.append(b)});$('allCount').textContent=items.length;$('favCount').textContent=items.filter(x=>x.favorite).length;$('uncatCount').textContent=items.filter(x=>!x.categoryId).length;$('sideCount').textContent=items.length+' items · '+categories.length+' categories';document.querySelectorAll('.sidebar > .navbtn[data-filter]').forEach(b=>b.classList.toggle('active',filter===b.dataset.filter));$('categoryNav').querySelectorAll('button').forEach(b=>b.classList.toggle('active',filter===b.dataset.filter));if(sidebar)sidebar.scrollTop=sidebarScroll}
+function renderCategories(){
+ const host=$('categoryNav');const sidebar=host.closest('.sidebar');const sidebarScroll=sidebar?sidebar.scrollTop:0;host.replaceChildren();
+ categories.forEach(cat=>{
+  const count=items.filter(x=>x.categoryId===cat.id).length;
+  const b=document.createElement('button');b.className='navbtn parent-nav'+(filter==='cat:'+cat.id?' active':'');b.dataset.filter='cat:'+cat.id;
+  const icon=document.createElement('span');icon.className='navico';icon.textContent='▧';const name=document.createElement('span');name.className='navname';name.textContent=cat.name;const n=document.createElement('span');n.className='navcount';n.textContent=count;b.append(icon,name,n);host.append(b);
+  if((cat.subcategories||[]).length){const group=document.createElement('div');group.className='category-indent';cat.subcategories.forEach(sub=>{const sb=document.createElement('button');sb.className='navbtn subcategory-nav'+(filter==='sub:'+sub.id?' active':'');sb.dataset.filter='sub:'+sub.id;const si=document.createElement('span');si.className='navico';si.textContent='↳';const sn=document.createElement('span');sn.className='navname';sn.textContent=sub.name;const sc=document.createElement('span');sc.className='navcount';sc.textContent=items.filter(x=>x.subcategoryId===sub.id).length;sb.append(si,sn,sc);group.append(sb)});host.append(group)}
+ });
+ $('allCount').textContent=items.length;$('favCount').textContent=items.filter(x=>x.favorite).length;$('uncatCount').textContent=items.filter(x=>!x.categoryId).length;$('sideCount').textContent=items.length+' items · '+categories.length+' main categories';
+ document.querySelectorAll('.sidebar > .navbtn[data-filter]').forEach(b=>b.classList.toggle('active',filter===b.dataset.filter));$('categoryNav').querySelectorAll('button').forEach(b=>b.classList.toggle('active',filter===b.dataset.filter));if(sidebar)sidebar.scrollTop=sidebarScroll;
+}
+function updateBulkControls(){const count=bulkSelectedIds.size;$('bulkCount').textContent='선택 '+count+'개';$('moveSelectedBtn').disabled=count===0;$('clearSelectionBtn').disabled=count===0;const list=currentList();const visibleIds=list.map(x=>x.id);const selectedVisible=visibleIds.filter(id=>bulkSelectedIds.has(id)).length;$('selectVisibleItems').checked=visibleIds.length>0&&selectedVisible===visibleIds.length;$('selectVisibleItems').indeterminate=selectedVisible>0&&selectedVisible<visibleIds.length}
 function renderList(resetScroll=false){
- const host=$('entryList');const oldScroll=host.scrollTop;const list=currentList();host.replaceChildren();
- $('statusCount').textContent=list.length+' objects';
- $('pathName').textContent=filter==='all'?'All items':filter==='favorite'?'Favorites':filter==='uncategorized'?'Unsorted':(categories.find(c=>('cat:'+c.id)===filter)?.name||'Category');
- $('resultHint').textContent=list.length+'개 항목 · '+(filter==='all'?'전체 보관함':filter==='favorite'?'즐겨찾기':filter==='uncategorized'?'미분류':categoryName(filter.slice(4)));
+ const host=$('entryList');const oldScroll=host.scrollTop;const list=currentList();host.replaceChildren();$('statusCount').textContent=list.length+' objects';
+ const fcat=filter.startsWith('cat:')?categories.find(c=>c.id===filter.slice(4)):null;const fsub=filter.startsWith('sub:')?findSubcategory(filter.slice(4)):null;
+ $('pathName').textContent=filter==='all'?'All items':filter==='favorite'?'Favorites':filter==='uncategorized'?'Unsorted':fcat?fcat.name:fsub?fsub.category.name+' › '+fsub.subcategory.name:'Category';
+ $('resultHint').textContent=list.length+'개 항목 · '+(filter==='all'?'전체 보관함':filter==='favorite'?'즐겨찾기':filter==='uncategorized'?'미분류':fcat?fcat.name:fsub?fsub.category.name+' › '+fsub.subcategory.name:'분류');
  if(!list.some(x=>x.id===selectedId))selectedId=list.length?list[0].id:null;
- if(!list.length){const empty=document.createElement('div');empty.className='empty-state';empty.innerHTML='<div class="big">♡</div>아직 저장된 항목이 없어요.<br>New(새 항목)로 직접 추가해 보세요.';host.append(empty)}
+ if(!list.length){const empty=document.createElement('div');empty.className='empty-state';empty.innerHTML='<div class="big">♡</div>아직 저장된 항목이 없어요.<br>New(새 항목) 또는 Batch(한 번에 등록)로 추가해 보세요.';host.append(empty)}
  list.forEach(item=>{
   const row=document.createElement('div');row.className='entry'+(item.id===selectedId?' selected':'');row.setAttribute('role','listitem');row.dataset.id=item.id;
+  const check=document.createElement('input');check.type='checkbox';check.className='row-check';check.checked=bulkSelectedIds.has(item.id);check.setAttribute('aria-label','선택: '+item.name);check.addEventListener('click',e=>e.stopPropagation());check.addEventListener('change',()=>{if(check.checked)bulkSelectedIds.add(item.id);else bulkSelectedIds.delete(item.id);updateBulkControls()});
   const main=document.createElement('button');main.type='button';main.className='entry-main entry-select';main.setAttribute('aria-label','항목 선택: '+item.name);
   const ico=document.createElement('span');ico.className='entry-fileicon';ico.textContent=item.favorite?'♥':'▤';
-  const copy=document.createElement('span');copy.className='entry-copy';
-  const name=document.createElement('span');name.className='entry-name';name.textContent=item.text.replace(/\s+/g,' ').trim();name.title=item.text;copy.append(name);main.append(ico,copy);
+  const copy=document.createElement('span');copy.className='entry-copy';const name=document.createElement('span');name.className='entry-name';name.textContent=item.text.replace(/\s+/g,' ').trim();name.title=item.text;const catLabel=document.createElement('span');catLabel.className='entry-category';catLabel.textContent=categoryPath(item.categoryId,item.subcategoryId);copy.append(name,catLabel);main.append(ico,copy);
   main.addEventListener('mousedown',e=>{if(e.button===0)e.preventDefault()});main.addEventListener('click',()=>selectItem(item.id));
   const copyButton=document.createElement('button');copyButton.type='button';copyButton.className='entry-copy-btn';copyButton.innerHTML='Copy <small class="gloss">복사</small>';copyButton.title='이 항목의 내용 복사';copyButton.setAttribute('aria-label','복사: '+item.name);copyButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();copyText(item.text)});
-  const date=document.createElement('span');date.className='entry-date';date.textContent=formatDate(item.updated);
-  row.append(main,copyButton,date);host.append(row);
+  const date=document.createElement('span');date.className='entry-date';date.textContent=formatDate(item.updated);row.append(check,main,copyButton,date);host.append(row);
  });
- host.scrollTop=resetScroll?0:oldScroll;updatePreview();renderCategories()
+ host.scrollTop=resetScroll?0:oldScroll;updatePreview();renderCategories();updateBulkControls();
 }
 function render(){renderList(true)}
 function selectItem(id){selectedId=id;$('entryList').querySelectorAll('.entry').forEach(row=>{const active=row.dataset.id===id;row.classList.toggle('selected',active);row.setAttribute('aria-selected',active?'true':'false')});updatePreview()}
@@ -679,23 +781,43 @@ async function copyText(text){
  if(ok){toast('Copied · 복사 완료 ♡');return}
  $('manualCopyText').value=text;$('manualCopyScrim').classList.add('open');setTimeout(()=>{$('manualCopyText').focus();$('manualCopyText').select()},30);
 }
-function fillCategorySelect(current=''){$('itemCategory').replaceChildren();const unc=document.createElement('option');unc.value='';unc.textContent='Unsorted · 미분류';$('itemCategory').append(unc);categories.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;$('itemCategory').append(o)});$('itemCategory').value=categories.some(c=>c.id===current)?current:''}
-function openItemDialog(item=null){editingId=item?item.id:null;$('itemDialogTitle').innerHTML=item?'Edit item <small class="gloss">항목 수정</small>':'New item <small class="gloss">새 항목</small>';$('itemText').value=item?.text||'';const defaultCategory= item?.categoryId || (filter.startsWith('cat:')?filter.slice(4):'');fillCategorySelect(defaultCategory);$('itemScrim').classList.add('open');setTimeout(()=>$('itemText').focus(),30)}
+function fillCategorySelect(current=''){$('itemCategory').replaceChildren();const unc=document.createElement('option');unc.value='';unc.textContent='Unsorted · 미분류';$('itemCategory').append(unc);categories.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;$('itemCategory').append(o)});$('itemCategory').value=categories.some(c=>c.id===current)?current:'';fillSubcategorySelect('itemSubcategory',$('itemCategory').value,'')}
+function fillSubcategorySelect(selectId,categoryId='',current=''){const select=$(selectId);if(!select)return;select.replaceChildren();const none=document.createElement('option');none.value='';none.textContent='소분류 없음';select.append(none);const cat=categories.find(c=>c.id===categoryId);(cat?.subcategories||[]).forEach(sub=>{const o=document.createElement('option');o.value=sub.id;o.textContent=sub.name;select.append(o)});select.value=(cat?.subcategories||[]).some(x=>x.id===current)?current:'';select.disabled=!cat||(cat.subcategories||[]).length===0}
+function fillMainSelect(selectId,current=''){const select=$(selectId);select.replaceChildren();const unc=document.createElement('option');unc.value='';unc.textContent='Unsorted · 미분류';select.append(unc);categories.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;select.append(o)});select.value=categories.some(c=>c.id===current)?current:''}
+function openItemDialog(item=null){editingId=item?item.id:null;$('itemDialogTitle').innerHTML=item?'Edit item <small class="gloss">항목 수정</small>':'New item <small class="gloss">새 항목</small>';$('itemText').value=item?.text||'';const defaultCategory=item?.categoryId||(filter.startsWith('cat:')?filter.slice(4):filter.startsWith('sub:')?findSubcategory(filter.slice(4))?.category.id:'');fillCategorySelect(defaultCategory);fillSubcategorySelect('itemSubcategory',defaultCategory,item?.subcategoryId|| (filter.startsWith('sub:')?filter.slice(4):''));$('itemScrim').classList.add('open');setTimeout(()=>$('itemText').focus(),30)}
 function closeItemDialog(){$('itemScrim').classList.remove('open');editingId=null}
-function saveItem(){const text=$('itemText').value;const name=itemNameFromText(text);const categoryId=$('itemCategory').value;if(!text.trim()){$('itemText').focus();toast('텍스트를 입력해 주세요.');return}const now=new Date().toISOString();if(editingId){const old=items.find(x=>x.id===editingId);if(old){old.name=name;old.text=text;old.categoryId=categoryId;old.updated=now}}else{const item={id:makeId('item'),name,text,categoryId,favorite:false,created:now,updated:now};items.unshift(item);selectedId=item.id}persist();const id=editingId;closeItemDialog();if(selectedId){filter='all';if(items.find(x=>x.id===selectedId)?.categoryId)filter='cat:'+items.find(x=>x.id===selectedId).categoryId}render();if(!id&&selectedId){const row=$('entryList').querySelector(`[data-id="${CSS.escape(selectedId)}"]`);row?.scrollIntoView({block:'nearest'})}toast(id?'Saved changes · 수정 완료':'Item saved · 항목 저장 완료')}
+function saveItem(){const text=$('itemText').value;const name=itemNameFromText(text);const categoryId=$('itemCategory').value;const subcategoryId=validSubcategoryId(categoryId,$('itemSubcategory').value);if(!text.trim()){$('itemText').focus();toast('텍스트를 입력해 주세요.');return}const now=new Date().toISOString();if(editingId){const old=items.find(x=>x.id===editingId);if(old){old.name=name;old.text=text;old.categoryId=categoryId;old.subcategoryId=subcategoryId;old.updated=now}}else{const item={id:makeId('item'),name,text,categoryId,subcategoryId,favorite:false,created:now,updated:now};items.unshift(item);selectedId=item.id}persist();const id=editingId;closeItemDialog();if(selectedId){const chosen=items.find(x=>x.id===selectedId);filter=chosen?.subcategoryId?'sub:'+chosen.subcategoryId:chosen?.categoryId?'cat:'+chosen.categoryId:'all'}render();toast(id?'Saved changes · 수정 완료':'Item saved · 항목 저장 완료')}
 function openCategoryDialog(){$('categoryScrim').classList.add('open');renderCategoryManager();setTimeout(()=>$('newCategoryName').focus(),30)}
 function closeCategoryDialog(){$('categoryScrim').classList.remove('open')}
-function renderCategoryManager(){const host=$('categoryList');host.replaceChildren();if(!categories.length){const p=document.createElement('div');p.className='dialog-note';p.textContent='아직 만든 카테고리가 없습니다.';host.append(p)}categories.forEach(cat=>{const row=document.createElement('div');row.className='category-row';const label=document.createElement('span');label.className='cat-label';label.textContent=cat.name;const rename=document.createElement('button');rename.type='button';rename.textContent='✎';rename.title='Rename · 이름 변경';rename.setAttribute('aria-label','Rename category · 카테고리 이름 변경');rename.addEventListener('click',()=>{const name=window.prompt('새 카테고리 이름을 입력하세요.',cat.name);if(name===null)return;const clean=name.trim().slice(0,28);if(!clean)return;if(categories.some(c=>c.id!==cat.id&&c.name.toLowerCase()===clean.toLowerCase())){alert('같은 이름의 카테고리가 이미 있어요.');return}cat.name=clean;persist();renderCategoryManager();render();toast('Category renamed · 이름 변경 완료')});const del=document.createElement('button');del.type='button';del.textContent='×';del.title='Delete · 삭제';del.setAttribute('aria-label','Delete category · 카테고리 삭제');del.addEventListener('click',()=>{if(!confirm(`'${cat.name}' 카테고리를 삭제할까요? 안의 항목은 미분류로 이동합니다.`))return;items.forEach(x=>{if(x.categoryId===cat.id){x.categoryId='';x.updated=new Date().toISOString()}});categories=categories.filter(c=>c.id!==cat.id);if(filter==='cat:'+cat.id)filter='all';persist();renderCategoryManager();render();toast('Category deleted · 분류 삭제 완료')});row.append(label,rename,del);host.append(row)})}
-function addCategory(){const input=$('newCategoryName');const name=input.value.trim().slice(0,28);if(!name){input.focus();return}if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){toast('이미 있는 카테고리예요.');return}categories.push({id:makeId('cat'),name});input.value='';persist();renderCategoryManager();renderCategories();fillCategorySelect($('itemCategory').value);toast('Category added · 분류 추가 완료')}
+function renderCategoryManager(){
+ const host=$('categoryList');host.replaceChildren();fillMainSelect('newSubParent');
+ if(!categories.length){const p=document.createElement('div');p.className='dialog-note';p.textContent='아직 만든 대분류가 없습니다.';host.append(p)}
+ categories.forEach(cat=>{
+  const row=document.createElement('div');row.className='category-row';const label=document.createElement('span');label.className='cat-label';label.textContent=cat.name;const kind=document.createElement('span');kind.className='cat-kind';kind.textContent='대분류';
+  const rename=document.createElement('button');rename.type='button';rename.textContent='✎';rename.title='대분류 이름 변경';rename.addEventListener('click',()=>{const name=prompt('새 대분류 이름을 입력하세요.',cat.name);if(name===null)return;const clean=name.trim().slice(0,28);if(!clean)return;if(categories.some(c=>c.id!==cat.id&&c.name.toLowerCase()===clean.toLowerCase())){alert('같은 이름의 대분류가 이미 있어요.');return}cat.name=clean;persist();renderCategoryManager();render();toast('Main category renamed · 대분류 이름 변경')});
+  const del=document.createElement('button');del.type='button';del.textContent='×';del.title='대분류 삭제';del.addEventListener('click',()=>{if(!confirm(`'${cat.name}' 대분류와 하위 소분류를 삭제할까요? 연결된 항목은 미분류로 이동합니다.`))return;items.forEach(x=>{if(x.categoryId===cat.id){x.categoryId='';x.subcategoryId='';x.updated=new Date().toISOString()}});categories=categories.filter(c=>c.id!==cat.id);if(filter==='cat:'+cat.id||(cat.subcategories||[]).some(sub=>filter==='sub:'+sub.id))filter='all';persist();renderCategoryManager();render();toast('Main category deleted · 대분류 삭제')});row.append(label,kind,rename,del);host.append(row);
+  (cat.subcategories||[]).forEach(sub=>{const sr=document.createElement('div');sr.className='category-row sub-row';const sl=document.createElement('span');sl.className='cat-label';sl.textContent='↳ '+sub.name;const sk=document.createElement('span');sk.className='cat-kind';sk.textContent='소분류';const sn=document.createElement('button');sn.type='button';sn.textContent='✎';sn.title='소분류 이름 변경';sn.addEventListener('click',()=>{const name=prompt(`'${cat.name}' 안의 새 소분류 이름을 입력하세요.`,sub.name);if(name===null)return;const clean=name.trim().slice(0,28);if(!clean)return;if(cat.subcategories.some(v=>v.id!==sub.id&&v.name.toLowerCase()===clean.toLowerCase())){alert('같은 소분류 이름이 이미 있어요.');return}sub.name=clean;persist();renderCategoryManager();render();toast('Subcategory renamed · 소분류 이름 변경')});const sd=document.createElement('button');sd.type='button';sd.textContent='×';sd.title='소분류 삭제';sd.addEventListener('click',()=>{if(!confirm(`'${sub.name}' 소분류를 삭제할까요? 항목은 '${cat.name}' 대분류에 남습니다.`))return;items.forEach(x=>{if(x.subcategoryId===sub.id){x.subcategoryId='';x.updated=new Date().toISOString()}});cat.subcategories=cat.subcategories.filter(v=>v.id!==sub.id);if(filter==='sub:'+sub.id)filter='cat:'+cat.id;persist();renderCategoryManager();render();toast('Subcategory deleted · 소분류 삭제')});sr.append(sl,sk,sn,sd);host.append(sr)})
+ });
+}
+function addCategory(){const input=$('newCategoryName');const name=input.value.trim().slice(0,28);if(!name){input.focus();return}if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){toast('이미 있는 대분류예요.');return}categories.push({id:makeId('cat'),name,subcategories:[]});input.value='';persist();renderCategoryManager();renderCategories();fillCategorySelect($('itemCategory').value);toast('Main category added · 대분류 추가 완료')}
+function addSubcategory(){const parentId=$('newSubParent').value;const input=$('newSubcategoryName');const name=input.value.trim().slice(0,28);const parent=categories.find(c=>c.id===parentId);if(!parent){toast('소분류를 넣을 대분류를 먼저 선택해 주세요.');$('newSubParent').focus();return}if(!name){input.focus();return}if(parent.subcategories.some(x=>x.name.toLowerCase()===name.toLowerCase())){toast('같은 이름의 소분류가 이미 있어요.');return}parent.subcategories.push({id:makeId('sub'),name});input.value='';persist();renderCategoryManager();renderCategories();fillCategorySelect($('itemCategory').value);toast('Subcategory added · 소분류 추가 완료')}
+function selectedVisibleIds(){return currentList().map(x=>x.id)}
+function selectVisibleItems(checked){selectedVisibleIds().forEach(id=>checked?bulkSelectedIds.add(id):bulkSelectedIds.delete(id));renderList(false)}
+function clearBulkSelection(){bulkSelectedIds.clear();renderList(false)}
+function openBatchDialog(){fillMainSelect('batchCategory',filter.startsWith('cat:')?filter.slice(4):filter.startsWith('sub:')?findSubcategory(filter.slice(4))?.category.id:'');fillSubcategorySelect('batchSubcategory',$('batchCategory').value,filter.startsWith('sub:')?filter.slice(4):'');$('batchText').value='';updateBatchPreview();$('batchScrim').classList.add('open');setTimeout(()=>$('batchText').focus(),30)}
+function updateBatchPreview(){const lines=$('batchText').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);const limited=lines.slice(0,200);$('batchPreview').textContent=`등록할 항목 ${limited.length}개${lines.length>200?' · 200개까지만 등록됩니다':''}`+(limited.length?'\n미리보기: '+limited.slice(0,3).join(' / ').slice(0,110):'')}
+function saveBatch(){const lines=$('batchText').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,200);if(!lines.length){toast('등록할 내용을 한 줄 이상 입력해 주세요.');$('batchText').focus();return}const categoryId=$('batchCategory').value;const subcategoryId=validSubcategoryId(categoryId,$('batchSubcategory').value);const now=new Date().toISOString();const added=lines.map(text=>({id:makeId('item'),name:itemNameFromText(text),text:text.slice(0,1500),categoryId,subcategoryId,favorite:false,created:now,updated:now}));items.unshift(...added);persist();bulkSelectedIds.clear();$('batchScrim').classList.remove('open');filter=subcategoryId?'sub:'+subcategoryId:categoryId?'cat:'+categoryId:'all';selectedId=added[0].id;render();const row=$('entryList').querySelector(`[data-id="${CSS.escape(selectedId)}"]`);row?.scrollIntoView({block:'nearest'});toast(`${added.length}개 항목 한 번에 등록 완료 ♡`)}
+function openMoveDialog(){const ids=Array.from(bulkSelectedIds).filter(id=>items.some(x=>x.id===id));if(!ids.length){toast('먼저 이동할 항목을 체크해 주세요.');return} $('moveSummary').textContent=`선택한 ${ids.length}개 항목을 한 번에 이동합니다. 새 위치를 지정해 주세요.`;fillMainSelect('moveCategory');fillSubcategorySelect('moveSubcategory','');$('moveScrim').classList.add('open')}
+function applyBulkMove(){const ids=new Set(Array.from(bulkSelectedIds));const categoryId=$('moveCategory').value;const subcategoryId=validSubcategoryId(categoryId,$('moveSubcategory').value);const now=new Date().toISOString();let moved=0;items.forEach(x=>{if(ids.has(x.id)){x.categoryId=categoryId;x.subcategoryId=subcategoryId;x.updated=now;moved++}});persist();bulkSelectedIds.clear();$('moveScrim').classList.remove('open');filter=subcategoryId?'sub:'+subcategoryId:categoryId?'cat:'+categoryId:'all';selectedId=moved?items.find(x=>ids.has(x.id))?.id:null;render();toast(`${moved}개 항목을 한 번에 이동했어요.`)}
 function exportBackup(){
   if(!currentEmail){alert('먼저 공간에 입장해 주세요.');return}
   const payload={
     app:'cotton.zip',
     format:'cotton.zip-space-backup',
-    version:4,
+    version:5,
     exportedAt:new Date().toISOString(),
-    categories:categories.map(c=>({id:c.id,name:c.name})),
-    items:items.map(x=>({id:x.id,text:x.text,categoryId:x.categoryId||'',favorite:!!x.favorite,created:x.created,updated:x.updated}))
+    categories:categories.map(c=>({id:c.id,name:c.name,subcategories:(c.subcategories||[]).map(sub=>({id:sub.id,name:sub.name}))})),
+    items:items.map(x=>({id:x.id,text:x.text,categoryId:x.categoryId||'',subcategoryId:x.subcategoryId||'',favorite:!!x.favorite,created:x.created,updated:x.updated}))
   };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(blob);
@@ -776,7 +898,9 @@ async function importBackup(file){
     let id=String(entry.id||makeId('item'));
     if(usedIds.has(id))id=makeId('item');
     usedIds.add(id);
-    return {id,text:textValue,categoryId,favorite:!!entry.favorite,created:entry.created||new Date().toISOString(),updated:entry.updated||entry.created||new Date().toISOString()};
+    let subcategoryId=typeof entry.subcategoryId==='string'?entry.subcategoryId:'';
+    if(!validSubcategoryId(categoryId,subcategoryId)&&categoryId){const subLabel=typeof entry.subcategory==='string'?entry.subcategory:typeof entry.subcategoryName==='string'?entry.subcategoryName:'';const parent=importedCategories.find(c=>c.id===categoryId);subcategoryId=parent?.subcategories.find(sub=>sub.name.toLowerCase()===subLabel.toLowerCase())?.id||''}
+    return {id,text:textValue,categoryId,subcategoryId:validSubcategoryId(categoryId,subcategoryId),favorite:!!entry.favorite,created:entry.created||new Date().toISOString(),updated:entry.updated||entry.created||new Date().toISOString()};
   }).filter(Boolean);
   if(payload.items.length&&adaptedItems.length===0)throw new Error('복원할 수 있는 텍스트 항목이 없어요. 백업 파일의 항목에 text 또는 content 값이 있는지 확인해 주세요.');
   let clean;
@@ -784,16 +908,16 @@ async function importBackup(file){
   try{clean=normalizeItems(adaptedItems);}
   finally{categories=previousCategories;}
   if(adaptedItems.length&&clean.length===0)throw new Error('항목을 읽었지만 저장 가능한 형식으로 변환하지 못했어요.');
-  const detail=`현재 공간의 자료를 선택한 백업으로 교체할까요?\n\n백업 파일: ${file.name}\n백업 항목: ${clean.length}개\n카테고리: ${importedCategories.length}개\n\n다른 이메일 공간은 변경하지 않습니다.`;
+  const detail=`현재 공간의 자료를 선택한 백업으로 교체할까요?\n\n백업 파일: ${file.name}\n백업 항목: ${clean.length}개\n대분류: ${importedCategories.length}개 / 소분류: ${importedCategories.reduce((n,c)=>n+(c.subcategories||[]).length,0)}개\n\n다른 이메일 공간은 변경하지 않습니다.`;
   if(!window.confirm(detail))return {cancelled:true};
-  categories=importedCategories;items=clean;
+  categories=importedCategories;items=clean;bulkSelectedIds.clear();
   if(!persist()){
     categories=previousCategories;items=previousItems;persist();
     throw new Error('브라우저 저장 공간이 부족해 복원하지 못했어요. 기존 자료는 유지했어요.');
   }
   filter='all';selectedId=null;query='';$('searchInput').value='';
   render();toast(`Backup loaded · ${clean.length}개 항목 복원 완료`);
-  return {loaded:true,count:clean.length,categories:importedCategories.length};
+  return {loaded:true,count:clean.length,categories:importedCategories.length,subcategories:importedCategories.reduce((n,c)=>n+(c.subcategories||[]).length,0)};
 }
 function openImportDialog(){
   const input=$('importFileInput');input.value='';
@@ -813,7 +937,7 @@ async function restoreSelectedBackup(){
     const result=await importBackup(file);
     if(result&&result.cancelled){feedback.textContent='복원을 취소했어요. 기존 자료는 그대로 유지됩니다.';return}
     feedback.className='import-feedback success';
-    feedback.textContent=`복원 완료! 항목 ${result.count}개, 카테고리 ${result.categories}개를 불러왔어요.`;
+    feedback.textContent=`복원 완료! 항목 ${result.count}개, 대분류 ${result.categories}개, 소분류 ${result.subcategories||0}개를 불러왔어요.`;
     closeImportDialog();
   }catch(error){
     feedback.className='import-feedback error';
@@ -835,10 +959,10 @@ $('logoutBtn').addEventListener('click',leaveSpace);
 document.querySelectorAll('.navbtn[data-filter]').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
 $('categoryNav').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(b)setFilter(b.dataset.filter)});
 $('searchInput').addEventListener('input',e=>{query=e.target.value;renderList(true)});
-$('newBtn').addEventListener('click',()=>openItemDialog());$('floatingAddBtn').addEventListener('click',()=>openItemDialog());$('saveItem').addEventListener('click',saveItem);$('cancelItem').addEventListener('click',closeItemDialog);
+$('newBtn').addEventListener('click',()=>openItemDialog());$('floatingAddBtn').addEventListener('click',()=>openItemDialog());$('saveItem').addEventListener('click',saveItem);$('cancelItem').addEventListener('click',closeItemDialog);$('batchBtn').addEventListener('click',openBatchDialog);$('cancelBatch').addEventListener('click',()=>$('batchScrim').classList.remove('open'));$('saveBatch').addEventListener('click',saveBatch);$('batchText').addEventListener('input',updateBatchPreview);$('itemCategory').addEventListener('change',()=>fillSubcategorySelect('itemSubcategory',$('itemCategory').value,''));$('batchCategory').addEventListener('change',()=>fillSubcategorySelect('batchSubcategory',$('batchCategory').value,''));$('moveCategory').addEventListener('change',()=>fillSubcategorySelect('moveSubcategory',$('moveCategory').value,''));$('newSubParent').addEventListener('change',()=>{});$('addSubcategory').addEventListener('click',addSubcategory);$('newSubcategoryName').addEventListener('keydown',e=>{if(e.key==='Enter')addSubcategory()});$('selectVisibleItems').addEventListener('change',e=>selectVisibleItems(e.target.checked));$('moveSelectedBtn').addEventListener('click',openMoveDialog);$('clearSelectionBtn').addEventListener('click',clearBulkSelection);$('cancelMove').addEventListener('click',()=>$('moveScrim').classList.remove('open'));$('applyMove').addEventListener('click',applyBulkMove);
 $('itemScrim').addEventListener('click',e=>{if(e.target===$('itemScrim'))closeItemDialog()});$('closeManualCopy').addEventListener('click',()=>$('manualCopyScrim').classList.remove('open'));$('selectCopyText').addEventListener('click',()=>{$('manualCopyText').focus();$('manualCopyText').select()});$('manualCopyScrim').addEventListener('click',e=>{if(e.target===$('manualCopyScrim'))$('manualCopyScrim').classList.remove('open')});
 $('editBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x)});
-$('deleteBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;if(!confirm(`'${x.name}' 항목을 삭제할까요?`))return;items=items.filter(y=>y.id!==x.id);selectedId=null;persist();renderList(false);toast('Item deleted · 항목 삭제 완료')});
+$('deleteBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;if(!confirm(`'${x.name}' 항목을 삭제할까요?`))return;items=items.filter(y=>y.id!==x.id);bulkSelectedIds.delete(x.id);selectedId=null;persist();renderList(false);toast('Item deleted · 항목 삭제 완료')});
 $('favBtn').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(!x)return;x.favorite=!x.favorite;x.updated=new Date().toISOString();persist();renderList(false);toast(x.favorite?'Added to favorites · 즐겨찾기 추가':'Removed from favorites · 즐겨찾기 해제')});
 $('backupBtn').addEventListener('click',exportBackup);$('startBackup').addEventListener('click',()=>{ $('startMenu').classList.remove('open'); exportBackup(); });$('startImport').addEventListener('click',()=>{ $('startMenu').classList.remove('open'); openImportDialog(); });
 $('importBtn').addEventListener('click',openImportDialog);
@@ -850,10 +974,10 @@ $('categoryBtn').addEventListener('click',openCategoryDialog);$('manageCategoryI
 $('desktopArchive').addEventListener('click',openWindow);$('desktopComputer').addEventListener('click',()=>alert('내 컴퓨터\n\n각 이메일의 공간 데이터는 이 브라우저에 분리 저장됩니다. JSON 백업 파일을 별도로 보관해 주세요.'));
 $('taskApp').addEventListener('click',()=>{if(!currentEmail){$('loginWindow').classList.remove('hidden');return}if($('appWindow').classList.contains('hidden'))openWindow();else $('appWindow').classList.toggle('hidden')});
 $('minBtn').addEventListener('click',()=>{$('appWindow').classList.add('hidden');$('taskApp').classList.remove('active')});$('closeBtn').addEventListener('click',()=>{$('appWindow').classList.add('hidden');$('taskApp').classList.remove('active')});$('maxBtn').addEventListener('click',()=>$('appWindow').classList.toggle('maximized'));
-$('startBtn').addEventListener('click',()=>$('startMenu').classList.toggle('open'));$('startOpen').addEventListener('click',openWindow);$('startHelp').addEventListener('click',()=>{ $('startMenu').classList.remove('open');alert('cotton.zip · little text archive\n\n이메일별로 분리된 로컬 텍스트 보관함입니다. 공간 안에서 카테고리를 만들고 자동 저장과 JSON 백업/복원을 할 수 있습니다.')});
+$('startBtn').addEventListener('click',()=>$('startMenu').classList.toggle('open'));$('startOpen').addEventListener('click',openWindow);$('startHelp').addEventListener('click',()=>{ $('startMenu').classList.remove('open');alert('cotton.zip · little text archive\n\n대분류 아래에 소분류를 만들 수 있어요. Batch로 여러 항목을 한꺼번에 등록하고, 목록 왼쪽 체크박스로 여러 항목을 선택해 새 분류로 한 번에 이동할 수 있습니다. 데이터는 이메일별 로컬 공간에 자동 저장되며 JSON 백업/복원을 지원합니다.')});
 $('fileMenu').addEventListener('click',openImportDialog);$('editMenu').addEventListener('click',()=>{const x=items.find(x=>x.id===selectedId);if(x)openItemDialog(x);else openItemDialog()});$('viewMenu').addEventListener('click',()=>{filter='all';$('searchInput').value='';query='';render();toast('All items · 전체 항목')});$('helpMenu').addEventListener('click',()=>$('startHelp').click());
 document.addEventListener('click',e=>{if(!$('startMenu').contains(e.target)&&e.target!==$('startBtn'))$('startMenu').classList.remove('open')});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeItemDialog();closeCategoryDialog();$('manualCopyScrim').classList.remove('open');closeImportDialog();$('startMenu').classList.remove('open')}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='n'){e.preventDefault();openItemDialog()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();exportBackup()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeItemDialog();closeCategoryDialog();$('batchScrim').classList.remove('open');$('moveScrim').classList.remove('open');$('manualCopyScrim').classList.remove('open');closeImportDialog();$('startMenu').classList.remove('open')}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='n'){e.preventDefault();openItemDialog()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();exportBackup()}});
 // Draggable classic desktop window. Pointer capture is limited to the title bar.
 const win=$('appWindow'),bar=$('titlebar');let drag=null;
 bar.addEventListener('pointerdown',e=>{if(e.target.closest('button')||win.classList.contains('maximized')||window.innerWidth<=700)return;const r=win.getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};bar.setPointerCapture(e.pointerId)});
